@@ -1,6 +1,7 @@
 package g
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -23,10 +24,18 @@ type GContext struct {
 	clientType        int //客户端类型
 	clientIP          string
 	conn              net.Conn
-	ResponseWriter    http.ResponseWriter
+	_httpWriter       http.ResponseWriter
 	Request           *http.Request
+	Writer            *GResponseWrite
 }
 type GHandlerFunc func(*GContext)
+
+func (c *GContext) flush() {
+	if c.Writer.statusCode > 0 {
+		c._httpWriter.WriteHeader(c.Writer.statusCode)
+	}
+	c._httpWriter.Write(c.Writer.data.Bytes())
+}
 
 // 数据绑定
 func (c *GContext) Bind(obj any) error {
@@ -44,8 +53,9 @@ func (c *GContext) Next() {
 		return
 	}
 	if c.clientType == CT_HTTP {
-		c.webHf[c.webHfCurrentIndex](c)
 		c.webHfCurrentIndex += 1
+		c.webHf[c.webHfCurrentIndex-1](c)
+
 	} else if c.clientType == CT_TCP {
 		c.webHf[c.webHfCurrentIndex](c)
 		c.webHfCurrentIndex += 1
@@ -72,7 +82,12 @@ func (c *GContext) GetClientIP() string {
 }
 
 func (c *GContext) webJson(obj any) {
-	fmt.Println(obj)
+	data, e := json.Marshal(obj)
+	if e != nil {
+		fmt.Println(obj, e)
+	} else {
+		c.Writer.Write(data)
+	}
 }
 
 // web json失败

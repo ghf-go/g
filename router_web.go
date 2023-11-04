@@ -2,6 +2,7 @@ package g
 
 import (
 	"errors"
+	"net/http"
 	"strings"
 )
 
@@ -47,11 +48,50 @@ func (n *router_web_node) getHandle(path, method string, m []GHandlerFunc) ([]GH
 	}
 	ns := strings.Split(path, "/")
 	lens := len(ns)
-	for i := lens - 1; i >= 0; i++ {
-		ps := strings.Join(ns, "/")
+	for i := lens - 1; i >= 0; i-- {
+		ps := strings.Join(ns[0:i], "/")
 		if aa, ok := n.nodes[ps]; ok {
 			return aa.getHandle("/"+strings.Join(ns[i:], "/"), method, ret)
 		}
 	}
 	return ret, errors.New("path not found")
+}
+
+// 网页路由
+func (ge *router_web_node) WebAny(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodGet, fen)
+	ge.add(name, http.MethodPost, fen)
+	ge.add(name, http.MethodPut, fen)
+	ge.add(name, http.MethodPatch, fen)
+	ge.add(name, http.MethodDelete, fen)
+	ge.add(name, http.MethodHead, fen)
+	ge.add(name, http.MethodTrace, fen)
+	ge.add(name, http.MethodOptions, fen)
+}
+func (ge *router_web_node) WebPost(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodPost, fen)
+}
+func (ge *router_web_node) WebGet(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodGet, fen)
+}
+func (ge *router_web_node) WebDelete(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodDelete, fen)
+}
+func (ge *router_web_node) WebPut(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodPut, fen)
+}
+func (ge *router_web_node) WebOptions(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodOptions, fen)
+}
+func (ge *router_web_node) WebTrace(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodTrace, fen)
+}
+func (ge *router_web_node) WebHead(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodHead, fen)
+}
+func (ge *router_web_node) WebPatch(name string, fen GHandlerFunc) {
+	ge.add(name, http.MethodPatch, fen)
+}
+func (ge *router_web_node) WebGroup(name string, fen ...GHandlerFunc) *router_web_node {
+	return ge.addGroup(name, fen...)
 }

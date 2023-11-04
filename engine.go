@@ -1,6 +1,7 @@
 package g
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net"
@@ -73,7 +74,7 @@ func (ge *GEngine) Start(confString []byte) {
 	ge.conf = sc
 	// ge.redis = sc.getRedis()
 	// ge.db = sc.getMysql()
-	fmt.Println(sc)
+	// fmt.Println(sc)
 	ge.redisCluster = sc.getClusterClient()
 	if ge.conf.App.WebPort > 0 {
 		ge.webServerStart()
@@ -213,15 +214,20 @@ func (ge *GEngine) SockAction() {}
 
 // httpHandle
 func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL, "------")
+	// fmt.Println(r.URL, "------")
 	path := r.URL.Path
 	c := &GContext{
-		engine:         ge,
-		ResponseWriter: w,
-		Request:        r,
-		clientType:     CT_HTTP,
+		engine:      ge,
+		_httpWriter: w,
+		Request:     r,
+		clientType:  CT_HTTP,
+		Writer: &GResponseWrite{
+			header:     w.Header(),
+			statusCode: 0,
+			data:       bytes.NewBuffer([]byte("")),
+		},
 	}
-	fmt.Println(c)
+	// fmt.Println(c)
 	if h, ok := ge.webServer.wshandles[path]; ok {
 		conn, err := wsupgrader.Upgrade(w, r, nil)
 		if err == nil {
@@ -243,6 +249,7 @@ func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	c.Next()
+	c.flush()
 }
 
 // 获取数据库
