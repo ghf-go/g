@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/gorilla/websocket"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
@@ -27,6 +28,7 @@ type GContext struct {
 	_httpWriter       http.ResponseWriter
 	Request           *http.Request
 	Writer            *GResponseWrite
+	wscon             *websocket.Conn
 }
 type GHandlerFunc func(*GContext)
 
@@ -137,4 +139,16 @@ func (c *GContext) Cancel() {
 }
 func (c *GContext) IsCancel() bool {
 	return c.isCancel
+}
+func (c *GContext) WsReadMsg() (messageType int, p []byte, err error) {
+	return c.wscon.ReadMessage()
+}
+func (c *GContext) WsReadJSON(obj any) error {
+	return c.wscon.ReadJSON(obj)
+}
+func (c *GContext) WsWriteMessage(messageType int, data []byte) error {
+	return c.wscon.WriteMessage(messageType, data)
+}
+func (c *GContext) WsWriteJSON(obj any) error {
+	return c.wscon.WriteJSON(obj)
 }

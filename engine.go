@@ -230,15 +230,12 @@ func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(c)
 	if h, ok := ge.webServer.wshandles[path]; ok {
 		conn, err := wsupgrader.Upgrade(w, r, nil)
-		if err == nil {
-			defer conn.Close()
+		if err != nil {
 			return
 		}
-		go func() {
-			for {
-				h(c)
-			}
-		}()
+		defer conn.Close()
+		c.wscon = conn
+		go h(c)
 		return
 	}
 	hs, e := ge.webServer.webRouter.getHandle(path, r.Method, []GHandlerFunc{})
