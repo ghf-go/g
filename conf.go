@@ -37,8 +37,9 @@ type redisConf struct {
 	ConnMaxLifetime int    `yaml:"con_max_life_time"`
 }
 type appConf struct {
-	WebPort  int `yaml:"web_port"`  //Web 端口
-	SockPort int `yaml:"sock_port"` //Sock 端口
+	WebPort int `yaml:"web_port"` //Web 端口
+	TcpPort int `yaml:"tcp_port"` //Sock 端口
+	UdpPort int `yaml:"udp_port"` //Sock 端口
 }
 
 type AppConf struct {

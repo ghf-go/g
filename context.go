@@ -1,16 +1,101 @@
 package g
 
 import (
+	"net"
+	"net/http"
+
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
+const (
+	CT_HTTP = 0
+	CT_TCP  = 1
+	CT_UPD  = 2
+)
+
 type GContext struct {
-	engine   *GEngine
-	isCancel bool
+	engine            *GEngine
+	isCancel          bool
+	webHf             []GHandlerFunc
+	webHfCurrentIndex int
+	clientType        int //客户端类型
+	clientIP          string
+	conn              net.Conn
+	ResponseWriter    http.ResponseWriter
+	Request           *http.Request
+}
+type GHandlerFunc func(*GContext)
+
+// 数据绑定
+func (c *GContext) Bind(obj any) error {
+	return nil
 }
 
-type SockHandlerFunc func(*GContext)
+// 绑定JSON
+func (c *GContext) BindJSON(obj any) error {
+	return nil
+}
+
+// 下一个方法
+func (c *GContext) Next() {
+	if c.clientType == CT_HTTP {
+		c.webHfCurrentIndex += 1
+		c.webHf[c.webHfCurrentIndex](c)
+	} else if c.clientType == CT_TCP {
+		c.webHfCurrentIndex += 1
+		c.webHf[c.webHfCurrentIndex](c)
+	} else if c.clientType == CT_UPD {
+		c.webHfCurrentIndex += 1
+		c.webHf[c.webHfCurrentIndex](c)
+	}
+}
+
+// 获取客户端IP
+func (c *GContext) GetClientIP() string {
+	if c.clientIP == "" {
+		if c.clientType == CT_HTTP {
+
+		} else if c.clientType == CT_TCP {
+			c.clientIP = c.conn.RemoteAddr().String()
+		} else if c.clientType == CT_UPD {
+			c.clientIP = c.conn.RemoteAddr().String()
+		} else {
+			c.clientIP = "unknow"
+		}
+	}
+	return c.clientIP
+}
+
+func (c *GContext) webJson(obj any) {}
+
+// web json失败
+func (c *GContext) WebJsonFail(code int, msg string) {
+	c.webJson(map[string]any{
+		"code": code,
+		"msg":  msg,
+		"data": map[string]any{},
+	})
+}
+
+// web json成功
+func (c *GContext) WebJsonSuccess(obj any) {
+	c.webJson(map[string]any{
+		"code": 0,
+		"msg":  "",
+		"data": map[string]any{},
+	})
+}
+
+// 显示模版
+func (c *GContext) WebView(obj any, tpl ...string) {
+
+}
+
+// 使用JSONP
+func (c *GContext) WebJsonP(call string, data any) {
+
+}
 
 // 获取数据库
 func (c *GContext) GetDB() *gorm.DB {
