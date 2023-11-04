@@ -51,7 +51,11 @@ func NewGEngine() *GEngine {
 	return &GEngine{
 		Ctx: context.Background(),
 		webServer: &_webServer{
-			webRouter: &router_web_node{},
+			webRouter: &router_web_node{
+				mid:   []GHandlerFunc{},
+				nodes: map[string]*router_web_node{},
+				hf:    map[string]map[string]GHandlerFunc{},
+			},
 		},
 		tcpServer: &_sockServer{},
 		udpServer: &_sockServer{},
@@ -67,18 +71,19 @@ func (ge *GEngine) Start(confString []byte) {
 		panic(e)
 	}
 	ge.conf = sc
-	ge.redis = sc.getRedis()
-	ge.db = sc.getMysql()
+	// ge.redis = sc.getRedis()
+	// ge.db = sc.getMysql()
+	fmt.Println(sc)
 	ge.redisCluster = sc.getClusterClient()
 	if ge.conf.App.WebPort > 0 {
 		ge.webServerStart()
 	}
-	if ge.conf.App.TcpPort > 0 {
-		ge.tcpServerStart()
-	}
-	if ge.conf.App.UdpPort > 0 {
-		ge.udpServerStart()
-	}
+	// if ge.conf.App.TcpPort > 0 {
+	// 	ge.tcpServerStart()
+	// }
+	// if ge.conf.App.UdpPort > 0 {
+	// 	ge.udpServerStart()
+	// }
 	//关闭功能
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
@@ -145,10 +150,13 @@ func (ge *GEngine) webServerStart() {
 		Addr:    fmt.Sprintf(":%d", ge.conf.App.WebPort),
 		Handler: ge,
 	}
+
 	go func() {
+		fmt.Println("qidong web", ge)
 		if e := ge.webServer.webServer.ListenAndServe(); e != nil {
 			panic("开启WEB服务失败" + e.Error())
 		}
+		fmt.Println("stop web", ge)
 	}()
 }
 
@@ -205,6 +213,7 @@ func (ge *GEngine) SockAction() {}
 
 // httpHandle
 func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.URL, "------")
 	path := r.URL.Path
 	c := &GContext{
 		engine:         ge,
@@ -212,6 +221,7 @@ func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Request:        r,
 		clientType:     CT_HTTP,
 	}
+	fmt.Println(c)
 	if h, ok := ge.webServer.wshandles[path]; ok {
 		conn, err := wsupgrader.Upgrade(w, r, nil)
 		if err == nil {

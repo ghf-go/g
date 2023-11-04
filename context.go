@@ -1,6 +1,7 @@
 package g
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 
@@ -39,15 +40,18 @@ func (c *GContext) BindJSON(obj any) error {
 
 // 下一个方法
 func (c *GContext) Next() {
+	if c.webHfCurrentIndex >= len(c.webHf) {
+		return
+	}
 	if c.clientType == CT_HTTP {
-		c.webHfCurrentIndex += 1
 		c.webHf[c.webHfCurrentIndex](c)
+		c.webHfCurrentIndex += 1
 	} else if c.clientType == CT_TCP {
-		c.webHfCurrentIndex += 1
 		c.webHf[c.webHfCurrentIndex](c)
+		c.webHfCurrentIndex += 1
 	} else if c.clientType == CT_UPD {
-		c.webHfCurrentIndex += 1
 		c.webHf[c.webHfCurrentIndex](c)
+		c.webHfCurrentIndex += 1
 	}
 }
 
@@ -67,7 +71,9 @@ func (c *GContext) GetClientIP() string {
 	return c.clientIP
 }
 
-func (c *GContext) webJson(obj any) {}
+func (c *GContext) webJson(obj any) {
+	fmt.Println(obj)
+}
 
 // web json失败
 func (c *GContext) WebJsonFail(code int, msg string) {
@@ -83,7 +89,7 @@ func (c *GContext) WebJsonSuccess(obj any) {
 	c.webJson(map[string]any{
 		"code": 0,
 		"msg":  "",
-		"data": map[string]any{},
+		"data": obj,
 	})
 }
 
