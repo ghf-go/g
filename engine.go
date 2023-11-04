@@ -206,6 +206,12 @@ func (ge *GEngine) SockAction() {}
 // httpHandle
 func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
+	c := &GContext{
+		engine:         ge,
+		ResponseWriter: w,
+		Request:        r,
+		clientType:     CT_HTTP,
+	}
 	if h, ok := ge.webServer.wshandles[path]; ok {
 		conn, err := wsupgrader.Upgrade(w, r, nil)
 		if err == nil {
@@ -214,10 +220,19 @@ func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		go func() {
 			for {
-				h()
+				h(c)
 			}
 		}()
+		return
 	}
+	hs, e := ge.webServer.webRouter.getHandle(path, r.Method, []GHandlerFunc{})
+	c.webHf = hs
+	if e != nil {
+		c.webHf = append(c.webHf, func(g *GContext) {
+			g.WebJsonFail(-1, e.Error())
+		})
+	}
+	c.Next()
 }
 
 // 获取数据库
