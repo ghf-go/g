@@ -72,8 +72,8 @@ func (ge *GEngine) Start(confString []byte) {
 		panic(e)
 	}
 	ge.conf = sc
-	// ge.redis = sc.getRedis()
-	// ge.db = sc.getMysql()
+	ge.redis = sc.getRedis()
+	ge.db = sc.getMysql()
 	// fmt.Println(sc)
 	ge.redisCluster = sc.getClusterClient()
 	if ge.conf.App.WebPort > 0 {
