@@ -117,7 +117,9 @@ func (c *GContext) WebView(obj any, tpl ...string) {
 
 // 使用JSONP
 func (c *GContext) WebJsonP(call string, data any) {
-
+	c.Writer.Write([]byte(call + "("))
+	c.webJson(data)
+	c.Writer.Write([]byte(");"))
 }
 
 // 获取数据库
