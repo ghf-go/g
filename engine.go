@@ -3,11 +3,13 @@ package g
 import (
 	"bytes"
 	"context"
+	"embed"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -206,8 +208,66 @@ func (ge *GEngine) WebGroup(name string, fen ...GHandlerFunc) *router_web_node {
 // Vue路径
 func (ge *GEngine) WebVue() {}
 
+// Vue路径 静态路径
+func (ge *GEngine) WebVueHistory(path, dirPath string, fs embed.FS) {
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
+	}
+	if !strings.HasSuffix(dirPath, "/") {
+		dirPath += "/"
+	}
+	ge.WebGroup(path, func(g *GContext) {
+		const defaultIndex = "index.html"
+		fielname := g.Request.URL.Path[len(path):]
+		if fielname == "" {
+			fielname = defaultIndex
+		}
+		f, e := fs.Open(dirPath + fielname)
+		if e != nil {
+			fielname = defaultIndex
+		}
+		f, _ = fs.Open(dirPath + fielname)
+		defer f.Close()
+		st, _ := f.Stat()
+		modtime := st.ModTime()
+		if g.Request.Method != "GET" || g.Request.Method != "HEAD" { //返回304功能
+			ims := g.Request.Header.Get("If-Modified-Since")
+
+			if ims != "" && IsTimeZero(modtime) {
+				t, err := http.ParseTime(ims)
+				if err == nil {
+					modtime = modtime.Truncate(time.Second)
+					if ret := modtime.Compare(t); ret <= 0 {
+						h := g.Writer.Header()
+						delete(h, "Content-Type")
+						delete(h, "Content-Length")
+						delete(h, "Content-Encoding")
+						if h.Get("Etag") != "" {
+							delete(h, "Last-Modified")
+						}
+						g.Writer.WriteHeader(http.StatusNotModified)
+						return
+					}
+				}
+			}
+		}
+
+		data, e := fs.ReadFile(dirPath + fielname)
+		if e != nil {
+			fielname = defaultIndex
+			data, _ = fs.ReadFile(dirPath + defaultIndex)
+		}
+		g.Writer.WriteHeader(http.StatusOK)
+		g.Writer.Header().Set("Last-Modified", modtime.UTC().Format(http.TimeFormat))
+		g.Writer.Header().Set("Content-Type", http.DetectContentType(data))
+		g.Writer.Write(data)
+	})
+}
+
 // 静态文件路径
-func (ge *GEngine) WebStatic() {}
+func (ge *GEngine) WebStatic() {
+	http.FileServer()
+}
 
 // Socket
 func (ge *GEngine) SockAction() {}
