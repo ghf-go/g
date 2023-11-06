@@ -42,10 +42,18 @@ type appConf struct {
 	UdpPort int `yaml:"udp_port"` //Sock 端口
 }
 
+type sessionConf struct {
+	Driver   string        `yaml:"driver"`
+	Name     string        `yaml:"session_name"`
+	Expire   time.Duration `yaml:"session_expire"`
+	JwtKey   string        `yaml:"jwtKey"`
+	RedisKey string        `yaml:"redis_key"`
+}
 type AppConf struct {
-	App   appConf   `yaml:"app"`
-	Db    dbConf    `yaml:"db"`
-	Redis redisConf `yaml:"redis"`
+	App     appConf     `yaml:"app"`
+	Db      dbConf      `yaml:"db"`
+	Redis   redisConf   `yaml:"redis"`
+	Session sessionConf `yaml:"session"`
 }
 
 // 获取数据连接

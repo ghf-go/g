@@ -29,6 +29,7 @@ type GContext struct {
 	Request           *http.Request
 	Writer            *GResponseWrite
 	wscon             *websocket.Conn
+	session           map[string]any //Session存储的数据
 }
 type GHandlerFunc func(*GContext)
 
@@ -37,6 +38,46 @@ func (c *GContext) flush() {
 		c._httpWriter.WriteHeader(c.Writer.statusCode)
 	}
 	c._httpWriter.Write(c.Writer.data.Bytes())
+}
+
+// 设置Session
+func (c *GContext) SessionSet(key string, val any) {
+	c.session[key] = val
+}
+
+// 删除session
+func (c *GContext) SessionDel(key ...string) {
+	if len(key) == 0 {
+		c.SessionDestory()
+	} else {
+		for _, k := range key {
+			delete(c.session, k)
+		}
+	}
+}
+
+// 获取session信息
+func (c *GContext) Session(key ...string) any {
+	if len(key) == 1 {
+		if r, ok := c.session[key[0]]; ok {
+			return r
+		}
+		return nil
+	}
+	ret := map[string]any{}
+	for _, k := range key {
+		if r, ok := c.session[k]; ok {
+			ret[k] = r
+		} else {
+			ret[k] = nil
+		}
+	}
+	return ret
+}
+
+// 清空session
+func (c *GContext) SessionDestory() {
+	c.session = map[string]any{}
 }
 
 // 数据绑定

@@ -105,6 +105,12 @@ func (ge *GEngine) Start(confString []byte) {
 		panic(e)
 	}
 	ge.conf = sc
+	switch sc.Session.Driver {
+	case "jwt":
+		ge.webServer.webRouter.mid = append([]GHandlerFunc{jwt_session}, ge.webServer.webRouter.mid...)
+	case "redis":
+		ge.webServer.webRouter.mid = append([]GHandlerFunc{redis_session}, ge.webServer.webRouter.mid...)
+	}
 	ge.redis = sc.getRedis()
 	ge.db = sc.getMysql()
 	// fmt.Println(sc)
@@ -312,6 +318,7 @@ func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			statusCode: 0,
 			data:       bytes.NewBuffer([]byte("")),
 		},
+		session: map[string]any{},
 	}
 	// fmt.Println(c)
 	if h, ok := ge.webServer.wshandles[path]; ok {
