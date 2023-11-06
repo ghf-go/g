@@ -111,8 +111,8 @@ func (c *GContext) WebJsonSuccess(obj any) {
 }
 
 // 显示模版
-func (c *GContext) WebView(obj any, tpl ...string) {
-
+func (c *GContext) WebView(obj any, tpl string) {
+	c.engine.template.Lookup("_templates").ExecuteTemplate(c.Writer, tpl, obj)
 }
 
 // 使用JSONP

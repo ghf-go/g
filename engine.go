@@ -5,6 +5,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"html/template"
 	"net"
 	"net/http"
 	"os"
@@ -47,6 +48,7 @@ type GEngine struct {
 	webServer    *_webServer
 	tcpServer    *_sockServer
 	udpServer    *_sockServer
+	template     *template.Template
 }
 
 // 新建引擎
@@ -62,8 +64,37 @@ func NewGEngine() *GEngine {
 		},
 		tcpServer: &_sockServer{},
 		udpServer: &_sockServer{},
+		template:  template.New("_templates"),
 	}
+}
 
+// 注册模版方法
+func (ge *GEngine) SetTemplateFuncMap(tf template.FuncMap) {
+	ge.template.Funcs(tf)
+}
+
+// 注册模版
+func (ge *GEngine) SetTemplate(groupname, path string, ff embed.FS) {
+	ffs, e := ff.ReadDir(path)
+	if e != nil {
+		panic(e.Error())
+	}
+	for _, item := range ffs {
+		if item.IsDir() {
+			name := item.Name()
+			finame := strings.Replace(item.Name(), path, "", 0)
+			ge.SetTemplate(groupname+finame+"_", name, ff)
+		} else {
+			dd, e := ff.ReadFile(item.Name())
+			if e != nil {
+				panic(e.Error())
+			}
+			_, e = ge.template.New(groupname + strings.Replace(item.Name(), path, "", 0)).Parse(string(dd))
+			if e != nil {
+				panic(e.Error())
+			}
+		}
+	}
 }
 
 // 服务运行
@@ -262,11 +293,6 @@ func (ge *GEngine) WebVueHistory(path, dirPath string, fs embed.FS) {
 		g.Writer.Header().Set("Content-Type", http.DetectContentType(data))
 		g.Writer.Write(data)
 	})
-}
-
-// 静态文件路径
-func (ge *GEngine) WebStatic() {
-	http.FileServer()
 }
 
 // Socket
