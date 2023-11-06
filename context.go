@@ -40,6 +40,46 @@ func (c *GContext) flush() {
 	c._httpWriter.Write(c.Writer.data.Bytes())
 }
 
+// 设置用户ID
+func (c *GContext) SetUserId(uid uint64) {
+	c.SessionSet("uid", uid)
+}
+
+// 回去用户ID
+func (c *GContext) GetUserId() uint64 {
+	return c.Session("uid").(uint64)
+}
+
+// 检查账号是否登录
+func (c *GContext) CheckoutUserLogin() bool {
+	return c.GetUserId() > 0
+}
+
+// 检查管理员是否登录
+func (c *GContext) CheckoutAdminLogin() bool {
+	return c.GetAdminId() > 0
+}
+
+// 获取管理员ID
+func (c *GContext) SetAdminId(uid uint64) {
+	c.SessionSet("admin_uid", uid)
+}
+
+// 获取管理员id
+func (c *GContext) GetAdminId() uint64 {
+	return c.Session("admin_uid").(uint64)
+}
+
+// 设置session字符串
+func (c *GContext) SessionSetString(key, val string) {
+	c.SessionSet(key, val)
+}
+
+// 获取session字符串
+func (c *GContext) SessionGetString(key string) string {
+	return c.Session("admin_uid").(string)
+}
+
 // 设置Session
 func (c *GContext) SessionSet(key string, val any) {
 	c.session[key] = val

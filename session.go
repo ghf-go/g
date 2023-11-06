@@ -42,13 +42,11 @@ func redis_session(g *GContext) {
 	cf := g.engine.conf.Session
 	sid := g.Request.Header.Get(cf.Name)
 	if sid != "" {
-		data, e := g.GetRedis().HGetAll(g.Request.Context(), sid).Result()
+		data, e := g.GetRedis().Get(g.Request.Context(), sid).Result()
 		if e != nil {
 			fmt.Println(e.Error())
 		} else {
-			for k, v := range data {
-				g.session[k] = v
-			}
+			json.Unmarshal([]byte(data), g.session)
 		}
 	}
 	g.Next()
@@ -56,19 +54,18 @@ func redis_session(g *GContext) {
 		if sid == "" {
 			sid = fmt.Sprintf("%s_%d", cf.RedisKey, time.Now().UnixNano())
 		}
-		keys := []any{}
-		for k, v := range g.session {
-			keys = append(keys, k, v)
+		rdata, e := json.Marshal(g.session)
+		if e == nil {
+			g.GetRedis().Set(g.Request.Context(), sid, string(rdata), cf.Expire)
+			g.Writer.Header().Add(cf.Name, sid)
+			http.SetCookie(g.Writer, &http.Cookie{
+				Name:    cf.Name,
+				Value:   sid,
+				Path:    "/",
+				Expires: time.Now().Add(cf.Expire),
+			})
 		}
-		g.GetRedis().HMSet(g.Request.Context(), sid, keys...)
-		g.GetRedis().Expire(g.Request.Context(), sid, cf.Expire)
-		g.Writer.Header().Add(cf.Name, sid)
-		http.SetCookie(g.Writer, &http.Cookie{
-			Name:    cf.Name,
-			Value:   sid,
-			Path:    "/",
-			Expires: time.Now().Add(cf.Expire),
-		})
+
 	}
 
 }
