@@ -13,7 +13,7 @@ type router_web_node struct {
 }
 
 // 添加路由
-func (n *router_web_node) add(name, method string, fen GHandlerFunc) {
+func (n *router_web_node) add(name, method string, fen GHandlerFunc) *router_web_node {
 	if nnn, ok := n.hf[name]; ok {
 		nnn[method] = fen
 		n.hf[name] = nnn
@@ -22,6 +22,7 @@ func (n *router_web_node) add(name, method string, fen GHandlerFunc) {
 			method: fen,
 		}
 	}
+	return n
 }
 
 // 添加分组
