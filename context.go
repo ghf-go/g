@@ -2,7 +2,6 @@ package g
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 
@@ -167,7 +166,7 @@ func (c *GContext) GetClientIP() string {
 func (c *GContext) webJson(obj any) {
 	data, e := json.Marshal(obj)
 	if e != nil {
-		fmt.Println(obj, e)
+		sysDebug("Web 返回json 编码失败 %s -> %v", e.Error(), obj)
 	} else {
 		c.Writer.Write(data)
 	}

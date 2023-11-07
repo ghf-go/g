@@ -2,9 +2,18 @@ package g
 
 import (
 	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
 	"encoding/hex"
+	"io"
 	"strconv"
 	"time"
+)
+
+const (
+	T_DATE     = "2006-01-02"
+	T_TIME     = "15:04:05.999"
+	T_DATETIME = "2006-01-02 15:04:05.999"
 )
 
 var unixEpochTime = time.Unix(0, 0)
@@ -14,30 +23,73 @@ func IsTimeZero(t time.Time) bool {
 	return t.IsZero() || t == unixEpochTime
 }
 
+// 格式化日期
+func FormatDate(t ...time.Time) string {
+	if len(t) > 0 {
+		return t[0].Format(T_DATE)
+	}
+	return time.Now().Format(T_DATE)
+}
+
+// 格式化时间
+func FormatTime(t ...time.Time) string {
+	if len(t) > 0 {
+		return t[0].Format(T_TIME)
+	}
+	return time.Now().Format(T_TIME)
+}
+
+// 格式化日期时间
+func FormatDateTime(t ...time.Time) string {
+	if len(t) > 0 {
+		return t[0].Format(T_DATETIME)
+	}
+	return time.Now().Format(T_DATETIME)
+}
+
 // Aes加密
 func AesEncode(key, data string) string {
-	a, e := aes.NewCipher([]byte(key))
-	if e != nil {
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
 		return ""
 	}
-	out := make([]byte, len(data))
-	a.Encrypt(out, []byte(data))
-	return hex.EncodeToString(out)
+	in := []byte(data)
+	leng := len(data)
+	if leng%16 != 0 {
+		leng = leng/16*16 + 16
+		leng = leng - len(data)
+		for i := 0; i < leng; i++ {
+			in = append(in, 0)
+		}
+		leng = len(in)
+	}
+
+	cipherText := make([]byte, aes.BlockSize+leng)
+	iv := cipherText[:aes.BlockSize]
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return ""
+	}
+	cipher.NewCBCEncrypter(block, iv).CryptBlocks(cipherText[aes.BlockSize:], in)
+	return hex.EncodeToString(cipherText)
 }
 
 // Aes解密
 func AesDecode(key, data string) string {
-	d, e := hex.DecodeString(data)
-	if e != nil {
+	ciphertext, err := hex.DecodeString(data)
+	if err != nil {
 		return ""
 	}
-	a, e := aes.NewCipher([]byte(key))
-	if e != nil {
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
 		return ""
 	}
-	out := make([]byte, len(d))
-	a.Decrypt(out, d)
-	return string(out)
+	if len(ciphertext) < aes.BlockSize {
+		return ""
+	}
+	iv := ciphertext[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+	cipher.NewCBCDecrypter(block, iv).CryptBlocks(ciphertext, ciphertext)
+	return string(ciphertext)
 }
 func String2Int64(src string) int64 {
 	r, e := strconv.ParseInt(src, 10, 64)

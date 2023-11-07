@@ -117,7 +117,7 @@ func (ge *GEngine) Start(confString []byte) {
 	}
 	ge.redis = sc.getRedis()
 	ge.db = sc.getMysql()
-	// fmt.Println(sc)
+
 	ge.redisCluster = sc.getClusterClient()
 	if ge.conf.App.WebPort > 0 {
 		ge.webServerStart()
@@ -208,11 +208,10 @@ func (ge *GEngine) webServerStart() {
 	}
 
 	go func() {
-		fmt.Println("qidong web", ge)
+		sysDebug("启动WEB服务")
 		if e := ge.webServer.webServer.ListenAndServe(); e != nil {
-			panic("开启WEB服务失败" + e.Error())
+			sysDebug("WEB服务关闭 %s", e.Error())
 		}
-		fmt.Println("stop web", ge)
 	}()
 }
 
@@ -322,7 +321,6 @@ func (ge *GEngine) SockAction() {}
 
 // httpHandle
 func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// fmt.Println(r.URL, "------")
 	path := r.URL.Path
 	c := &GContext{
 		engine:      ge,
@@ -336,7 +334,6 @@ func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		},
 		session: map[string]any{},
 	}
-	// fmt.Println(c)
 	if h, ok := ge.webServer.wshandles[path]; ok {
 		conn, err := wsupgrader.Upgrade(w, r, nil)
 		if err != nil {

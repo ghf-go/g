@@ -43,11 +43,11 @@ type appConf struct {
 }
 
 type sessionConf struct {
-	Driver   string        `yaml:"driver"`
-	Name     string        `yaml:"session_name"`
-	Expire   time.Duration `yaml:"session_expire"`
-	JwtKey   string        `yaml:"jwtKey"`
-	RedisKey string        `yaml:"redis_key"`
+	Driver   string `yaml:"driver"`
+	Name     string `yaml:"session_name"`
+	Expire   int    `yaml:"session_expire"`
+	JwtKey   string `yaml:"jwtKey"`
+	RedisKey string `yaml:"redis_key"`
 }
 type AppConf struct {
 	App     appConf     `yaml:"app"`
@@ -58,6 +58,7 @@ type AppConf struct {
 
 // 获取数据连接
 func (c AppConf) getMysql() *gorm.DB {
+
 	db, e := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=Local", c.Db.Write.UserName,
 		c.Db.Write.Password, c.Db.Write.Host, c.Db.DbName, c.Db.Charset)), &gorm.Config{})
 	if e != nil {
