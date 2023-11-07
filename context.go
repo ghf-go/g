@@ -234,3 +234,8 @@ func (c *GContext) WsWriteMessage(messageType int, data []byte) error {
 func (c *GContext) WsWriteJSON(obj any) error {
 	return c.wscon.WriteJSON(obj)
 }
+
+// 绑定POST提交的JSON数据
+func (c *GContext) BindJson(obj any) error {
+	return bindRequestBodyJson(c.Request, obj)
+}
