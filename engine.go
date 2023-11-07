@@ -49,6 +49,8 @@ type GEngine struct {
 	tcpServer    *_sockServer
 	udpServer    *_sockServer
 	template     *template.Template
+	mq           gmqServer
+	jobs         gJobServer
 }
 
 // 新建引擎
@@ -65,6 +67,8 @@ func NewGEngine() *GEngine {
 		tcpServer: &_sockServer{},
 		udpServer: &_sockServer{},
 		template:  template.New("_templates"),
+		mq:        gmqServer{},
+		jobs:      gJobServer{},
 	}
 }
 
@@ -118,6 +122,12 @@ func (ge *GEngine) Start(confString []byte) {
 	if ge.conf.App.WebPort > 0 {
 		ge.webServerStart()
 	}
+	if len(ge.jobs) > 0 { //启动job
+		ge.jobs.start(ge)
+	}
+	if len(ge.mq) > 0 { //启动队列消费
+		ge.mq.start(ge)
+	}
 	// if ge.conf.App.TcpPort > 0 {
 	// 	ge.tcpServerStart()
 	// }
@@ -139,6 +149,12 @@ func (ge *GEngine) Start(confString []byte) {
 
 	if ge.webServer.webServer != nil {
 		ge.webServer.webServer.Shutdown(ct) //关闭web
+	}
+	if len(ge.jobs) > 0 { //启动job
+		ge.jobs.stop()
+	}
+	if len(ge.mq) > 0 { //启动队列消费
+		ge.mq.stop()
 	}
 }
 
@@ -355,4 +371,19 @@ func (ge *GEngine) GetRedis() *redis.Client {
 // 获取Reids
 func (ge *GEngine) GetRedisCluster() *redis.ClusterClient {
 	return ge.redisCluster
+}
+
+// 注册任务列表
+func (ge *GEngine) AddJob(j ...GJob) {
+	ge.jobs = append(ge.jobs, j...)
+}
+
+// 注册消息队列
+func (ge *GEngine) AddMq(q ...GMQ) {
+	ge.mq = append(ge.mq, q...)
+}
+
+// 注册Redis队列
+func (ge *GEngine) AddMqRedis(redisKey string, msgcall func(msg string)) {
+	ge.mq = append(ge.mq, NewMqRedis(redisKey, msgcall))
 }
