@@ -63,6 +63,7 @@ func NewGEngine() *GEngine {
 				nodes: map[string]*router_web_node{},
 				hf:    map[string]map[string]GHandlerFunc{},
 			},
+			wshandles: map[string]GHandlerFunc{},
 		},
 		tcpServer: &_sockServer{},
 		udpServer: &_sockServer{},
@@ -215,48 +216,6 @@ func (ge *GEngine) webServerStart() {
 	}()
 }
 
-// 注册websock
-func (ge *GEngine) WebSock() {}
-
-// 网页路由
-func (ge *GEngine) WebAny(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodGet, fen)
-	ge.webServer.webRouter.add(name, http.MethodPost, fen)
-	ge.webServer.webRouter.add(name, http.MethodPut, fen)
-	ge.webServer.webRouter.add(name, http.MethodPatch, fen)
-	ge.webServer.webRouter.add(name, http.MethodDelete, fen)
-	ge.webServer.webRouter.add(name, http.MethodHead, fen)
-	ge.webServer.webRouter.add(name, http.MethodTrace, fen)
-	ge.webServer.webRouter.add(name, http.MethodOptions, fen)
-}
-func (ge *GEngine) WebPost(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodPost, fen)
-}
-func (ge *GEngine) WebGet(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodGet, fen)
-}
-func (ge *GEngine) WebDelete(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodDelete, fen)
-}
-func (ge *GEngine) WebPut(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodPut, fen)
-}
-func (ge *GEngine) WebOptions(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodOptions, fen)
-}
-func (ge *GEngine) WebTrace(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodTrace, fen)
-}
-func (ge *GEngine) WebHead(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodHead, fen)
-}
-func (ge *GEngine) WebPatch(name string, fen GHandlerFunc) {
-	ge.webServer.webRouter.add(name, http.MethodPatch, fen)
-}
-func (ge *GEngine) WebGroup(name string, fen ...GHandlerFunc) *router_web_node {
-	return ge.webServer.webRouter.addGroup(name, fen...)
-}
-
 // Vue路径
 func (ge *GEngine) WebVue() {}
 
@@ -383,4 +342,48 @@ func (ge *GEngine) AddMq(q ...GMQ) {
 // 注册Redis队列
 func (ge *GEngine) AddMqRedis(redisKey string, msgcall func(msg string)) {
 	ge.mq = append(ge.mq, NewMqRedis(redisKey, msgcall))
+}
+
+// 网页路由
+func (ge *GEngine) WebAny(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodGet, fen)
+	ge.webServer.webRouter.add(name, http.MethodPost, fen)
+	ge.webServer.webRouter.add(name, http.MethodPut, fen)
+	ge.webServer.webRouter.add(name, http.MethodPatch, fen)
+	ge.webServer.webRouter.add(name, http.MethodDelete, fen)
+	ge.webServer.webRouter.add(name, http.MethodHead, fen)
+	ge.webServer.webRouter.add(name, http.MethodTrace, fen)
+	ge.webServer.webRouter.add(name, http.MethodOptions, fen)
+}
+func (ge *GEngine) WebPost(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodPost, fen)
+}
+func (ge *GEngine) WebGet(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodGet, fen)
+}
+func (ge *GEngine) WebDelete(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodDelete, fen)
+}
+func (ge *GEngine) WebPut(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodPut, fen)
+}
+func (ge *GEngine) WebOptions(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodOptions, fen)
+}
+func (ge *GEngine) WebTrace(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodTrace, fen)
+}
+func (ge *GEngine) WebHead(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodHead, fen)
+}
+func (ge *GEngine) WebPatch(name string, fen GHandlerFunc) {
+	ge.webServer.webRouter.add(name, http.MethodPatch, fen)
+}
+func (ge *GEngine) WebGroup(name string, fen ...GHandlerFunc) *router_web_node {
+	return ge.webServer.webRouter.addGroup(name, fen...)
+}
+
+// 注册websock
+func (ge *GEngine) WebSock(path string, h GHandlerFunc) {
+	ge.webServer.wshandles[path] = h
 }
