@@ -1,0 +1,38 @@
+app:
+  web_port: 8081
+  tcp_port: 0
+  udp_port: 0
+db:
+  dbname: aa
+  charset: utf8mb4
+  max_idle_cons: 5
+  max_open_cons: 10
+  con_max_idle_time: 600
+  con_max_life_time: 3600
+  write:
+    host: 127.0.0.1:3306
+    username:
+    passwd:
+  read:
+    - host: 127.0.0.1:3306
+      username:
+      passwd:
+    - host: 127.0.0.1:3306
+      username:
+      passwd:
+
+redis:
+  addr: 127.0.0.1
+  username:
+  password:
+  min_idle_cons: 5
+  max_idle_cons: 20
+  max_active_cons: 10
+  con_max_idle_time: 60
+  con_max_life_time: 600
+session:
+  driver: jwt
+  session_name: sid
+  session_expire: 3600
+  jwtKey: asdfsadfsdf
+  redis_key: sess_

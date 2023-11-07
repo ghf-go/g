@@ -31,7 +31,7 @@ func jwt_session(g *GContext) {
 				Name:    cf.Name,
 				Value:   sdata,
 				Path:    "/",
-				Expires: time.Now().Add(cf.Expire),
+				Expires: time.Now().Add(cf.Expire * time.Second),
 			})
 		}
 	}
@@ -56,13 +56,13 @@ func redis_session(g *GContext) {
 		}
 		rdata, e := json.Marshal(g.session)
 		if e == nil {
-			g.GetRedis().Set(g.Request.Context(), sid, string(rdata), cf.Expire)
+			g.GetRedis().Set(g.Request.Context(), sid, string(rdata), cf.Expire*time.Second)
 			g.Writer.Header().Add(cf.Name, sid)
 			http.SetCookie(g.Writer, &http.Cookie{
 				Name:    cf.Name,
 				Value:   sid,
 				Path:    "/",
-				Expires: time.Now().Add(cf.Expire),
+				Expires: time.Now().Add(cf.Expire * time.Second),
 			})
 		}
 
