@@ -58,7 +58,7 @@ func (n *router_web_node) getHandle(path, method string, m []GHandlerFunc) ([]GH
 }
 
 // 网页路由
-func (ge *router_web_node) WebAny(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Any(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodGet, fen)
 	ge.add(name, http.MethodPost, fen)
 	ge.add(name, http.MethodPut, fen)
@@ -69,38 +69,38 @@ func (ge *router_web_node) WebAny(name string, fen GHandlerFunc) *router_web_nod
 	ge.add(name, http.MethodOptions, fen)
 	return ge
 }
-func (ge *router_web_node) WebPost(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Post(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodPost, fen)
 	return ge
 }
-func (ge *router_web_node) WebGet(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Get(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodGet, fen)
 	return ge
 }
-func (ge *router_web_node) WebDelete(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Delete(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodDelete, fen)
 	return ge
 }
-func (ge *router_web_node) WebPut(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Put(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodPut, fen)
 	return ge
 }
-func (ge *router_web_node) WebOptions(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Options(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodOptions, fen)
 	return ge
 }
-func (ge *router_web_node) WebTrace(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Trace(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodTrace, fen)
 	return ge
 }
-func (ge *router_web_node) WebHead(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Head(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodHead, fen)
 	return ge
 }
-func (ge *router_web_node) WebPatch(name string, fen GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Patch(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodPatch, fen)
 	return ge
 }
-func (ge *router_web_node) WebGroup(name string, fen ...GHandlerFunc) *router_web_node {
+func (ge *router_web_node) Group(name string, fen ...GHandlerFunc) *router_web_node {
 	return ge.addGroup(name, fen...)
 }
