@@ -3,6 +3,7 @@ package g
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/md5"
 	"encoding/hex"
 	"io"
 	"math/rand"
@@ -60,6 +61,12 @@ func FormatDateTime(t ...time.Time) string {
 		return t[0].Format(T_DATETIME)
 	}
 	return time.Now().Format(T_DATETIME)
+}
+
+// Md5
+func Md5(src string) string {
+	m5 := md5.New()
+	return string(m5.Sum([]byte(src)))
 }
 
 // Aes加密
