@@ -2,7 +2,6 @@ package g
 
 import (
 	"encoding/json"
-	"io"
 	"net"
 	"net/http"
 
@@ -128,25 +127,6 @@ func (c *GContext) SessionDestory() {
 	c.session = map[string]any{}
 }
 
-// 数据绑定
-func (c *GContext) Bind(obj any) error {
-	return nil
-}
-
-// 绑定JSON
-func (c *GContext) BindJSON(obj any) error {
-	body, e := c.Request.GetBody()
-	if e != nil {
-		return e
-	}
-	defer body.Close()
-	data, e := io.ReadAll(body)
-	if e != nil {
-		return e
-	}
-	return json.Unmarshal(data, obj)
-}
-
 // 下一个方法
 func (c *GContext) Next() {
 	if c.webHfCurrentIndex >= len(c.webHf) {
@@ -254,6 +234,6 @@ func (c *GContext) WsWriteJSON(obj any) error {
 }
 
 // 绑定POST提交的JSON数据
-func (c *GContext) BindJson(obj any) error {
+func (c *GContext) BindJSON(obj any) error {
 	return bindRequestBodyJson(c.Request, obj)
 }
