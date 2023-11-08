@@ -3,10 +3,11 @@ package g
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
 	"encoding/hex"
 	"io"
+	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -19,6 +20,18 @@ const (
 var unixEpochTime = time.Unix(0, 0)
 
 type Map map[string]any
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+// 生成随机字符串
+func RandomString(n int) string {
+	sb := strings.Builder{}
+	sb.Grow(n)
+	for i := 0; i < n; i++ {
+		sb.WriteByte(charset[rand.Intn(len(charset))])
+	}
+	return sb.String()
+}
 
 // 时间是否为空
 func IsTimeZero(t time.Time) bool {
