@@ -2,6 +2,7 @@ package g
 
 import (
 	"encoding/json"
+	"io"
 	"net"
 	"net/http"
 
@@ -134,7 +135,16 @@ func (c *GContext) Bind(obj any) error {
 
 // 绑定JSON
 func (c *GContext) BindJSON(obj any) error {
-	return nil
+	body, e := c.Request.GetBody()
+	if e != nil {
+		return e
+	}
+	defer body.Close()
+	data, e := io.ReadAll(body)
+	if e != nil {
+		return e
+	}
+	return json.Unmarshal(data, obj)
 }
 
 // 下一个方法
