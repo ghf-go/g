@@ -235,5 +235,9 @@ func (c *GContext) WsWriteJSON(obj any) error {
 
 // 绑定POST提交的JSON数据
 func (c *GContext) BindJSON(obj any) error {
-	return bindRequestBodyJson(c.Request, obj)
+	r := bindRequestBodyJson(c.Request, obj)
+	if r != nil {
+		c.WebJsonFail(1, "系统错误")
+	}
+	return r
 }
