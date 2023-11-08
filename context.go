@@ -66,7 +66,11 @@ func (c *GContext) SetAdminId(uid uint64) {
 
 // 获取管理员id
 func (c *GContext) GetAdminId() uint64 {
-	return c.Session("admin_uid").(uint64)
+	r := c.Session("admin_uid")
+	if r == nil {
+		return 0
+	}
+	return r.(uint64)
 }
 
 // 设置session字符串
@@ -76,7 +80,11 @@ func (c *GContext) SessionSetString(key, val string) {
 
 // 获取session字符串
 func (c *GContext) SessionGetString(key string) string {
-	return c.Session("admin_uid").(string)
+	r := c.Session(key)
+	if r != nil {
+		return r.(string)
+	}
+	return ""
 }
 
 // 设置Session
