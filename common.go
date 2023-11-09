@@ -247,3 +247,140 @@ func String2Bool(src string) bool {
 	}
 	return r
 }
+
+// Map相关
+func (m Map) GetString(key string, def ...string) string {
+	if r, ok := m[key]; ok {
+		return r.(string)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return ""
+}
+func (m Map) GetInt(key string, def ...int) int {
+	if r, ok := m[key]; ok {
+		return r.(int)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetInt8(key string, def ...int8) int8 {
+	if r, ok := m[key]; ok {
+		return r.(int8)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetInt16(key string, def ...int16) int16 {
+	if r, ok := m[key]; ok {
+		return r.(int16)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetInt32(key string, def ...int32) int32 {
+	if r, ok := m[key]; ok {
+		return r.(int32)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetInt64(key string, def ...int64) int64 {
+	if r, ok := m[key]; ok {
+		return r.(int64)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetUint(key string, def ...uint) uint {
+	if r, ok := m[key]; ok {
+		return r.(uint)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetUint8(key string, def ...uint8) uint8 {
+	if r, ok := m[key]; ok {
+		return r.(uint8)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetUint16(key string, def ...uint16) uint16 {
+	if r, ok := m[key]; ok {
+		return r.(uint16)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetUint32(key string, def ...uint32) uint32 {
+	if r, ok := m[key]; ok {
+		return r.(uint32)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetUint64(key string, def ...uint64) uint64 {
+	if r, ok := m[key]; ok {
+		return r.(uint64)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetBool(key string, def ...bool) bool {
+	if r, ok := m[key]; ok {
+		return r.(bool)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return false
+}
+func (m Map) GetFloat32(key string, def ...float32) float32 {
+	if r, ok := m[key]; ok {
+		return r.(float32)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) GetFloat64(key string, def ...float64) float64 {
+	if r, ok := m[key]; ok {
+		return r.(float64)
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return 0
+}
+func (m Map) Get(key string, def ...any) any {
+	if r, ok := m[key]; ok {
+		return r
+	}
+	if len(def) > 0 {
+		return def[0]
+	}
+	return nil
+}
