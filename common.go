@@ -22,7 +22,7 @@ const (
 
 var unixEpochTime = time.Unix(0, 0)
 
-type Map map[string]any
+type Map map[any]any
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -249,7 +249,7 @@ func String2Bool(src string) bool {
 }
 
 // Map相关
-func (m Map) GetString(key string, def ...string) string {
+func (m Map) GetString(key any, def ...string) string {
 	if r, ok := m[key]; ok {
 		return r.(string)
 	}
@@ -258,7 +258,7 @@ func (m Map) GetString(key string, def ...string) string {
 	}
 	return ""
 }
-func (m Map) GetInt(key string, def ...int) int {
+func (m Map) GetInt(key any, def ...int) int {
 	if r, ok := m[key]; ok {
 		return r.(int)
 	}
@@ -267,7 +267,7 @@ func (m Map) GetInt(key string, def ...int) int {
 	}
 	return 0
 }
-func (m Map) GetInt8(key string, def ...int8) int8 {
+func (m Map) GetInt8(key any, def ...int8) int8 {
 	if r, ok := m[key]; ok {
 		return r.(int8)
 	}
@@ -276,7 +276,7 @@ func (m Map) GetInt8(key string, def ...int8) int8 {
 	}
 	return 0
 }
-func (m Map) GetInt16(key string, def ...int16) int16 {
+func (m Map) GetInt16(key any, def ...int16) int16 {
 	if r, ok := m[key]; ok {
 		return r.(int16)
 	}
@@ -285,7 +285,7 @@ func (m Map) GetInt16(key string, def ...int16) int16 {
 	}
 	return 0
 }
-func (m Map) GetInt32(key string, def ...int32) int32 {
+func (m Map) GetInt32(key any, def ...int32) int32 {
 	if r, ok := m[key]; ok {
 		return r.(int32)
 	}
@@ -294,7 +294,7 @@ func (m Map) GetInt32(key string, def ...int32) int32 {
 	}
 	return 0
 }
-func (m Map) GetInt64(key string, def ...int64) int64 {
+func (m Map) GetInt64(key any, def ...int64) int64 {
 	if r, ok := m[key]; ok {
 		return r.(int64)
 	}
@@ -303,7 +303,7 @@ func (m Map) GetInt64(key string, def ...int64) int64 {
 	}
 	return 0
 }
-func (m Map) GetUint(key string, def ...uint) uint {
+func (m Map) GetUint(key any, def ...uint) uint {
 	if r, ok := m[key]; ok {
 		return r.(uint)
 	}
@@ -312,7 +312,7 @@ func (m Map) GetUint(key string, def ...uint) uint {
 	}
 	return 0
 }
-func (m Map) GetUint8(key string, def ...uint8) uint8 {
+func (m Map) GetUint8(key any, def ...uint8) uint8 {
 	if r, ok := m[key]; ok {
 		return r.(uint8)
 	}
@@ -321,7 +321,7 @@ func (m Map) GetUint8(key string, def ...uint8) uint8 {
 	}
 	return 0
 }
-func (m Map) GetUint16(key string, def ...uint16) uint16 {
+func (m Map) GetUint16(key any, def ...uint16) uint16 {
 	if r, ok := m[key]; ok {
 		return r.(uint16)
 	}
@@ -330,7 +330,7 @@ func (m Map) GetUint16(key string, def ...uint16) uint16 {
 	}
 	return 0
 }
-func (m Map) GetUint32(key string, def ...uint32) uint32 {
+func (m Map) GetUint32(key any, def ...uint32) uint32 {
 	if r, ok := m[key]; ok {
 		return r.(uint32)
 	}
@@ -339,7 +339,7 @@ func (m Map) GetUint32(key string, def ...uint32) uint32 {
 	}
 	return 0
 }
-func (m Map) GetUint64(key string, def ...uint64) uint64 {
+func (m Map) GetUint64(key any, def ...uint64) uint64 {
 	if r, ok := m[key]; ok {
 		return r.(uint64)
 	}
@@ -348,7 +348,7 @@ func (m Map) GetUint64(key string, def ...uint64) uint64 {
 	}
 	return 0
 }
-func (m Map) GetBool(key string, def ...bool) bool {
+func (m Map) GetBool(key any, def ...bool) bool {
 	if r, ok := m[key]; ok {
 		return r.(bool)
 	}
@@ -357,7 +357,7 @@ func (m Map) GetBool(key string, def ...bool) bool {
 	}
 	return false
 }
-func (m Map) GetFloat32(key string, def ...float32) float32 {
+func (m Map) GetFloat32(key any, def ...float32) float32 {
 	if r, ok := m[key]; ok {
 		return r.(float32)
 	}
@@ -366,7 +366,7 @@ func (m Map) GetFloat32(key string, def ...float32) float32 {
 	}
 	return 0
 }
-func (m Map) GetFloat64(key string, def ...float64) float64 {
+func (m Map) GetFloat64(key any, def ...float64) float64 {
 	if r, ok := m[key]; ok {
 		return r.(float64)
 	}
@@ -375,7 +375,7 @@ func (m Map) GetFloat64(key string, def ...float64) float64 {
 	}
 	return 0
 }
-func (m Map) Get(key string, def ...any) any {
+func (m Map) Get(key any, def ...any) any {
 	if r, ok := m[key]; ok {
 		return r
 	}
