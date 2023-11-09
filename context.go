@@ -149,7 +149,7 @@ func (c *GContext) Next() {
 func (c *GContext) GetClientIP() string {
 	if c.clientIP == "" {
 		if c.clientType == CT_HTTP {
-
+			c.clientIP = GetRequestIP(c.Request)
 		} else if c.clientType == CT_TCP {
 			c.clientIP = c.conn.RemoteAddr().String()
 		} else if c.clientType == CT_UPD {

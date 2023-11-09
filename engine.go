@@ -291,7 +291,8 @@ func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			statusCode: 0,
 			data:       bytes.NewBuffer([]byte("")),
 		},
-		session: map[string]any{},
+		clientIP: GetRequestIP(r),
+		session:  map[string]any{},
 	}
 	if h, ok := ge.webServer.wshandles[path]; ok {
 		conn, err := wsupgrader.Upgrade(w, r, nil)

@@ -4,9 +4,11 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
+	cr "crypto/rand"
 	"encoding/hex"
 	"io"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -63,6 +65,47 @@ func FormatDateTime(t ...time.Time) string {
 	return time.Now().Format(T_DATETIME)
 }
 
+// 获取http请求的IP
+func GetRequestIP(r *http.Request) string {
+	ret := r.Header.Get("ipv4")
+	if ret != "" {
+		return ret
+	}
+	ret = r.Header.Get("X-Forwarded-For")
+	if ret != "" {
+		rs := strings.Split(ret, ",")
+		if rs[0] != "" {
+			return rs[0]
+		}
+	}
+	ret = r.Header.Get("XForwardedFor")
+	if ret != "" {
+		rs := strings.Split(ret, ",")
+		if rs[0] != "" {
+			return rs[0]
+		}
+	}
+	ret = r.Header.Get("X-Real-Ip")
+	if ret != "" {
+		rs := strings.Split(ret, ",")
+		if rs[0] != "" {
+			return rs[0]
+		}
+	}
+	ret = r.Header.Get("X-Real-IP")
+	if ret != "" {
+		rs := strings.Split(ret, ",")
+		if rs[0] != "" {
+			return rs[0]
+		}
+	}
+	ret = r.RemoteAddr
+	if ret != "" {
+		return ret
+	}
+	return "unknow"
+}
+
 // Md5
 func Md5(src string) string {
 	m5 := md5.New()
@@ -88,7 +131,7 @@ func AesEncode(key, data string) string {
 
 	cipherText := make([]byte, aes.BlockSize+leng)
 	iv := cipherText[:aes.BlockSize]
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+	if _, err := io.ReadFull(cr.Reader, iv); err != nil {
 		return ""
 	}
 	cipher.NewCBCEncrypter(block, iv).CryptBlocks(cipherText[aes.BlockSize:], in)
