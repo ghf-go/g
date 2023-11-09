@@ -1,6 +1,7 @@
 package g
 
 import (
+	"context"
 	"encoding/json"
 	"net"
 	"net/http"
@@ -240,4 +241,12 @@ func (c *GContext) BindJSON(obj any) error {
 		c.WebJsonFail(1, "系统错误")
 	}
 	return r
+}
+
+// 返回上下文
+func (c *GContext) Context() context.Context {
+	if c.Request != nil {
+		return c.Request.Context()
+	}
+	return c.engine.Ctx
 }
