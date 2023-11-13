@@ -163,6 +163,7 @@ func (c *GContext) GetClientIP() string {
 }
 
 func (c *GContext) webJson(obj any) {
+	c.Writer.Header().Add("Content-Type", "application/json;charset=utf8;")
 	data, e := json.Marshal(obj)
 	if e != nil {
 		sysDebug("Web 返回json 编码失败 %s -> %v", e.Error(), obj)

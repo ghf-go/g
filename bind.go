@@ -8,10 +8,10 @@ import (
 
 // 绑定Post的JSON内容
 func bindRequestBodyJson(r *http.Request, obj any) error {
-	body, e := r.GetBody()
-	if e != nil {
-		return e
-	}
+	body := r.Body
+	// if e != nil {
+	// 	return e
+	// }
 	defer body.Close()
 	data, e := io.ReadAll(body)
 	if e != nil {
