@@ -2,6 +2,7 @@ package g
 
 import (
 	"crypto/rand"
+	_ "embed"
 	"fmt"
 	"image"
 	"image/color"
@@ -24,6 +25,11 @@ const (
 	defaultDpi      = 72
 )
 
+var defaultFontName = "HYSongYunLangHeiW-1"
+
+//go:embed font/HYSongYunLangHeiW-1.ttf
+var defaultFontData []byte
+
 // 图形验证码 使用字体默认ttf格式
 // w 图片宽度, h图片高度，CodeLen验证码的个数
 // FontSize 字体大小, Dpi 清晰度，FontPath 字体目录， FontName 字体名字
@@ -39,7 +45,7 @@ type Captcha struct {
 
 // 实例化验证码
 func NewCaptcha(w, h, CodeLen int) *Captcha {
-	return &Captcha{W: w, H: h, CodeLen: CodeLen}
+	return &Captcha{W: w, H: h, CodeLen: CodeLen, fontName: defaultFontName, fontData: defaultFontData}
 }
 
 // 输出
