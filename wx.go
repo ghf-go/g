@@ -80,6 +80,11 @@ func WxHandle(call func(c *GContext, msg *wxMsg)) GHandlerFunc {
 	}
 }
 
+// 微信服务器验证接口使用的时候注册即可
+func WxDomainCheckAction(c *GContext) {
+	c.Writer.Write([]byte(c.Request.URL.Query().Get("echostr")))
+}
+
 // 服务器端获取的Token信息
 type wxservertoken struct {
 	AccessToken string `json:"access_token"`
