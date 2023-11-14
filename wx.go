@@ -1,8 +1,11 @@
 package g
 
 import (
+	"encoding/xml"
 	"fmt"
+	"io"
 	"net/url"
+	"time"
 )
 
 // 微信公众号配置
@@ -19,6 +22,62 @@ type Wx struct {
 // 创建微信配置
 func NewWx() *Wx {
 	return &Wx{}
+}
+
+// 接收到微信推送的消息
+type wxMsg struct {
+	c            *GContext `xml:"-"`
+	ToUserName   string    `xml:"ToUserName"`
+	FromUserName string    `xml:"FromUserName"`
+	CreateTime   uint64    `xml:"CreateTime"`
+	MsgType      string    `xml:"MsgType"`
+	Content      string    `xml:"Content"`
+	MsgId        int64     `xml:"MsgId"`
+	MsgDataId    string    `xml:"MsgDataId"`
+	Idx          string    `xml:"Idx"`
+
+	PicUrl       string `xml:"PicUrl"`
+	MediaId      string `xml:"MediaId"`
+	Format       string `xml:"Format"`
+	Recognition  string `xml:"Recognition"`
+	ThumbMediaId string `xml:"ThumbMediaId"`
+
+	Label      string  `xml:"Label"`
+	Location_Y float64 `xml:"Location_Y"`
+	Location_X float64 `xml:"Location_X"`
+	Scale      int     `xml:"Scale"`
+
+	Title       string `xml:"Title"`
+	Description string `xml:"Description"`
+	Url         string `xml:"Url"`
+
+	Event     string  `xml:"Event"`
+	EventKey  string  `xml:"EventKey"`
+	Ticket    string  `xml:"Ticket"`
+	Latitude  float64 `xml:"Latitude"`
+	Longitude float64 `xml:"Longitude"`
+	Precision float64 `xml:"Precision"`
+}
+
+// 创建微信接收消息方法
+func WxHandle(call func(c *GContext, msg *wxMsg)) GHandlerFunc {
+	return func(c *GContext) {
+		msg := &wxMsg{}
+		data, e := io.ReadAll(c.Request.Body)
+		if e != nil {
+			c.WebJsonFail(-1, e.Error())
+			return
+		}
+
+		defer c.Request.Body.Close()
+		e = xml.Unmarshal(data, msg)
+		if e != nil {
+			c.WebJsonFail(-1, e.Error())
+			return
+		}
+		msg.c = c
+		call(c, msg)
+	}
 }
 
 // 服务器端获取的Token信息
@@ -172,4 +231,48 @@ func (w *Wx) UploadImgMsg(mediaType, fileName string, data []byte) string {
 		return ""
 	}
 	return ret.GetString("url", "")
+}
+
+// ////消息相关
+
+// 回复文本消息
+func (m *wxMsg) SendText(msg string) {
+	m.c.Writer.Write([]byte(fmt.Sprintf("<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%d</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[%s]]></Content></xml>", m.FromUserName, m.ToUserName, time.Now().Unix(), msg)))
+}
+
+// 回复图片消息
+func (m *wxMsg) SendImg(MediaId string) {
+	m.c.Writer.Write([]byte(fmt.Sprintf("<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%d</CreateTime><MsgType><![CDATA[image]]></MsgType><Image><MediaId><![CDATA[%s]]></MediaId></Image></xml>", m.FromUserName, m.ToUserName, time.Now().Unix(), MediaId)))
+
+}
+
+// 回复声音
+func (m *wxMsg) SendVoice(MediaId string) {
+	m.c.Writer.Write([]byte(fmt.Sprintf("<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%d</CreateTime><MsgType><![CDATA[voice]]></MsgType><Voice><MediaId><![CDATA[%s]]></MediaId></Voice></xml>", m.FromUserName, m.ToUserName, time.Now().Unix(), MediaId)))
+
+}
+
+// 回复视频
+func (m *wxMsg) SendVideo(MediaId, title, desc string) {
+	m.c.Writer.Write([]byte(fmt.Sprintf("<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%d</CreateTime><MsgType><![CDATA[video]]></MsgType><Video><MediaId><![CDATA[%s]]></MediaId><Title><![CDATA[%s]]></Title><Description><![CDATA[%s]]></Description></Video></xml>", m.FromUserName, m.ToUserName, time.Now().Unix(), MediaId, title, desc)))
+
+}
+
+// 回复音乐
+func (m *wxMsg) SendMusic(title, desc, thumid, murl, hqurl string) {
+	m.c.Writer.Write([]byte(fmt.Sprintf("<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%d</CreateTime><MsgType><![CDATA[music]]></MsgType><Music><ThumbMediaId><![CDATA[%s]]></ThumbMediaId><Title><![CDATA[%s]]></Title><Description><![CDATA[%s]]></Description><MusicUrl><![CDATA[%]]></MusicUrl><HQMusicUrl><![CDATA[%s]]></HQMusicUrl></Music></xml>", m.FromUserName, m.ToUserName, time.Now().Unix(), thumid, title, desc, murl, hqurl)))
+
+}
+
+// 回复图文 map {"title":xxx,"desc":"","picurl":"","url":""}
+func (m *wxMsg) SendNews(data []Map) {
+	ret := fmt.Sprintf("<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%d</CreateTime><MsgType><![CDATA[news]]></MsgType>", m.FromUserName, m.ToUserName, time.Now().Unix())
+	ret += fmt.Sprintf("<ArticleCount>%d</ArticleCount> <Articles>", len(data))
+	for _, item := range data {
+		ret += fmt.Sprintf("<item><Title><![CDATA[%s]]></Title><Description><![CDATA[%s]]></Description><PicUrl><![CDATA[%s]]></PicUrl><Url><![CDATA[%s]]></Url> </item>",
+			item.GetString("title"), item.GetString("desc"), item.GetString("picurl"), item.GetString("url"))
+	}
+	ret += "</Articles></xml>"
+	m.c.Writer.Write([]byte(ret))
+
 }
