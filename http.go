@@ -50,7 +50,7 @@ func GetJSON(url string, ret any) error {
 	return json.Unmarshal(rd, ret)
 }
 
-// 删除文件使用字节的方式
+// 上传文件使用字节的方式
 func PostFileByteJSON(url, postname, filename string, fdata []byte, ret any) error {
 	b := &bytes.Buffer{}
 	w := multipart.NewWriter(b)
