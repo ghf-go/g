@@ -109,7 +109,8 @@ func GetRequestIP(r *http.Request) string {
 // Md5
 func Md5(src string) string {
 	m5 := md5.New()
-	return string(m5.Sum([]byte(src)))
+	m5.Write([]byte(src))
+	return hex.EncodeToString(m5.Sum(nil))
 }
 
 // Aes加密
