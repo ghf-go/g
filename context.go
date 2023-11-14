@@ -33,6 +33,10 @@ type GContext struct {
 }
 type GHandlerFunc func(*GContext)
 
+func (c *GContext) Referer() string {
+	return c.Request.Header.Get("Referer")
+}
+
 func (c *GContext) flush() {
 	if c.Writer.statusCode > 0 {
 		c._httpWriter.WriteHeader(c.Writer.statusCode)
