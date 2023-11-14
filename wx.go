@@ -265,7 +265,7 @@ func (m *wxMsg) SendVideo(MediaId, title, desc string) {
 
 // 回复音乐
 func (m *wxMsg) SendMusic(title, desc, thumid, murl, hqurl string) {
-	m.c.Writer.Write([]byte(fmt.Sprintf("<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%d</CreateTime><MsgType><![CDATA[music]]></MsgType><Music><ThumbMediaId><![CDATA[%s]]></ThumbMediaId><Title><![CDATA[%s]]></Title><Description><![CDATA[%s]]></Description><MusicUrl><![CDATA[%]]></MusicUrl><HQMusicUrl><![CDATA[%s]]></HQMusicUrl></Music></xml>", m.FromUserName, m.ToUserName, time.Now().Unix(), thumid, title, desc, murl, hqurl)))
+	m.c.Writer.Write([]byte(fmt.Sprintf("<xml><ToUserName><![CDATA[%s]]></ToUserName><FromUserName><![CDATA[%s]]></FromUserName><CreateTime>%d</CreateTime><MsgType><![CDATA[music]]></MsgType><Music><ThumbMediaId><![CDATA[%s]]></ThumbMediaId><Title><![CDATA[%s]]></Title><Description><![CDATA[%s]]></Description><MusicUrl><![CDATA[%s]]></MusicUrl><HQMusicUrl><![CDATA[%s]]></HQMusicUrl></Music></xml>", m.FromUserName, m.ToUserName, time.Now().Unix(), thumid, title, desc, murl, hqurl)))
 
 }
 
