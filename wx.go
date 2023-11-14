@@ -137,3 +137,39 @@ func (w *Wx) WebCheckToken(token, openid string) bool {
 	}
 	return false
 }
+
+// 上传临时素材
+func (w *Wx) UploadTmpMedia(mediaType, fileName string, data []byte) string {
+	ret := Map{}
+	if PostFileByteJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s", w.web.AccessToken, mediaType), "media", fileName, data, ret) != nil {
+		return ""
+	}
+	return ret.GetString("media_id", "")
+}
+
+// 获取临时素材信息
+func (w *Wx) GetTmpMedia(mid string) string {
+	ret := Map{}
+	if GetJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s", w.web.AccessToken, mid), ret) != nil {
+		return ""
+	}
+	return ret.GetString("video_url", "")
+}
+
+// 上传素材
+func (w *Wx) UploadMedia(mediaType, fileName string, data []byte) string {
+	ret := Map{}
+	if PostFileByteJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=%s&type=%s", w.web.AccessToken, mediaType), "media", fileName, data, ret) != nil {
+		return ""
+	}
+	return ret.GetString("media_id", "")
+}
+
+// 上传图文消息的图片，图片要小于1M
+func (w *Wx) UploadImgMsg(mediaType, fileName string, data []byte) string {
+	ret := Map{}
+	if PostFileByteJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=%s", w.web.AccessToken), "media", fileName, data, ret) != nil {
+		return ""
+	}
+	return ret.GetString("url", "")
+}
