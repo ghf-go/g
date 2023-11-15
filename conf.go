@@ -52,7 +52,15 @@ type appConf struct {
 	UdpPort     int    `yaml:"udp_port"`     //Sock 端口
 	TemplateDir string `yaml:"template_dir"` //模板路径
 }
-
+type wxWeb struct {
+	AppId       string `yaml:"app_id"`
+	AppSecret   string `yaml:"app_secret"`
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
+}
+type wxConf struct {
+	web *wxWeb `yaml:"app"`
+}
 type sessionConf struct {
 	Driver   string `yaml:"driver"`
 	Name     string `yaml:"session_name"`
@@ -65,7 +73,8 @@ type AppConf struct {
 	Db      dbConf      `yaml:"db"`
 	Redis   redisConf   `yaml:"redis"`
 	Session sessionConf `yaml:"session"`
-	Stmp    stmpConf    `yaml:"stmp"` //邮件服务器配置
+	Stmp    stmpConf    `yaml:"stmp"`   //邮件服务器配置
+	WxConf  *wxConf     `yaml:"wechat"` //微信配置
 }
 
 // 发送邮件
@@ -89,6 +98,11 @@ func (c AppConf) SendMail(to, subject string, isHtml bool, msg []byte) error {
 	msg = []byte("To: " + to + "\r\nFrom: " + c.Stmp.UserName + "\r\nSubject: " + subject + "\r\n" + content_type + "\r\n\r\n" + string(msg))
 
 	return smtp.SendMail(c.Stmp.Host, auth, c.Stmp.UserName, []string{to}, msg)
+}
+
+// 获取微信配置
+func (c AppConf) GetWxConf() *wxConf {
+	return c.WxConf
 }
 
 // 获取数据连接

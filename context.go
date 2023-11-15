@@ -196,6 +196,11 @@ func (c *GContext) WebJsonSuccess(obj any) {
 	})
 }
 
+// 获取微信配置
+func (c *GContext) GetWxConf() *wxConf {
+	return c.engine.conf.GetWxConf()
+}
+
 // 显示模版
 func (c *GContext) WebView(obj any, tpl string) {
 	// fmt.Println(c.engine.conf.App.TemplateDir + tpl)

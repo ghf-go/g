@@ -44,3 +44,8 @@ stmp:
   passwd:
   auth_type: CRAMMD5
   template_pre:
+
+wechat:
+  app:
+    app_id:
+    app_secret:

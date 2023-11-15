@@ -8,22 +8,6 @@ import (
 	"time"
 )
 
-// 微信公众号配置
-type wxWeb struct {
-	AppId       string
-	AppSecret   string
-	AccessToken string `json:"access_token"`
-	ExpiresIn   int    `json:"expires_in"`
-}
-type Wx struct {
-	web wxWeb
-}
-
-// 创建微信配置
-func NewWx() *Wx {
-	return &Wx{}
-}
-
 // 接收到微信推送的消息
 type wxMsg struct {
 	c            *GContext `xml:"-"`
@@ -120,7 +104,7 @@ type WxUserInfo struct {
 }
 
 // 服务器端获取Token
-func (w *Wx) ServerTokenFirst() {
+func (w *wxConf) ServerTokenFirst() {
 	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", w.web.AppId, w.web.AppSecret)
 	st := &wxservertoken{}
 	if GetJSON(url, st) != nil {
@@ -130,7 +114,7 @@ func (w *Wx) ServerTokenFirst() {
 }
 
 // 获取公众号后台的Token
-func (w *Wx) ServerToken(force_refresh ...bool) {
+func (w *wxConf) ServerToken(force_refresh ...bool) {
 	rd := Map{
 		"grant_type":    "client_credential",
 		"appid":         w.web.AppId,
@@ -148,53 +132,53 @@ func (w *Wx) ServerToken(force_refresh ...bool) {
 }
 
 // 获取公众号后台配置的菜单
-func (w *Wx) ServerGetMenu() Map {
+func (w *wxConf) ServerGetMenu() Map {
 	ret := Map{}
 	GetJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info?access_token=%s", w.web.AccessToken), ret)
 	return ret
 }
 
 // 删除公众号的菜单
-func (w *Wx) ServerDelMenu() bool {
+func (w *wxConf) ServerDelMenu() bool {
 	ret := Map{}
 	GetJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=%s", w.web.AccessToken), ret)
 	return ret.GetInt("errcode") == 0
 }
 
 // 更新公众号菜单
-func (w *Wx) ServerCreateMenu(data any) bool {
+func (w *wxConf) ServerCreateMenu(data any) bool {
 	ret := Map{}
 	PostJSON(fmt.Sprintf(" https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s", w.web.AccessToken), data, ret)
 	return ret.GetInt("errcode") == 0
 }
 
 // 网页授权基本功能
-func (w *Wx) WebUrlBase(returnurl string) string {
+func (w *wxConf) WebUrlBase(returnurl string) string {
 	return fmt.Sprintf("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=123#wechat_redirec", w.web.AppId, url.QueryEscape(returnurl))
 }
 
 // 网页授权用户信息
-func (w *Wx) WebUrlUserInfo(returnurl string) string {
+func (w *wxConf) WebUrlUserInfo(returnurl string) string {
 	return fmt.Sprintf("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirec", w.web.AppId, url.QueryEscape(returnurl))
 }
 
 // 获取web的TOKEN
-func (w *Wx) WebGetToken(code string, ret *WxWebToken) error {
+func (w *wxConf) WebGetToken(code string, ret *WxWebToken) error {
 	return GetJSON(fmt.Sprintf("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", w.web.AppId, w.web.AppSecret, code), ret)
 }
 
 // 刷新WEB TOKEN
-func (w *Wx) WebRefreshToken(refresh_token string, ret *WxWebToken) error {
+func (w *wxConf) WebRefreshToken(refresh_token string, ret *WxWebToken) error {
 	return GetJSON(fmt.Sprintf("https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=%s&grant_type=refresh_token&refresh_token=%s", w.web.AppId, refresh_token), ret)
 }
 
 // 获取用户信息
-func (w *Wx) GetUserInfo(token, openid string, ret *WxUserInfo) error {
+func (w *wxConf) GetUserInfo(token, openid string, ret *WxUserInfo) error {
 	return GetJSON(fmt.Sprintf("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN", token, openid), ret)
 }
 
 // 检查Token是否有效
-func (w *Wx) WebCheckToken(token, openid string) bool {
+func (w *wxConf) WebCheckToken(token, openid string) bool {
 	ret := &WxUserInfo{}
 	if GetJSON(fmt.Sprintf("https://api.weixin.qq.com/sns/auth?access_token=%s&openid=%s", token, openid), ret) == nil {
 		return ret.ErrCode == 0
@@ -203,7 +187,7 @@ func (w *Wx) WebCheckToken(token, openid string) bool {
 }
 
 // 上传临时素材
-func (w *Wx) UploadTmpMedia(mediaType, fileName string, data []byte) string {
+func (w *wxConf) UploadTmpMedia(mediaType, fileName string, data []byte) string {
 	ret := Map{}
 	if PostFileByteJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s", w.web.AccessToken, mediaType), "media", fileName, data, ret) != nil {
 		return ""
@@ -212,7 +196,7 @@ func (w *Wx) UploadTmpMedia(mediaType, fileName string, data []byte) string {
 }
 
 // 获取临时素材信息
-func (w *Wx) GetTmpMedia(mid string) string {
+func (w *wxConf) GetTmpMedia(mid string) string {
 	ret := Map{}
 	if GetJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s", w.web.AccessToken, mid), ret) != nil {
 		return ""
@@ -221,7 +205,7 @@ func (w *Wx) GetTmpMedia(mid string) string {
 }
 
 // 上传素材
-func (w *Wx) UploadMedia(mediaType, fileName string, data []byte) string {
+func (w *wxConf) UploadMedia(mediaType, fileName string, data []byte) string {
 	ret := Map{}
 	if PostFileByteJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=%s&type=%s", w.web.AccessToken, mediaType), "media", fileName, data, ret) != nil {
 		return ""
@@ -230,7 +214,7 @@ func (w *Wx) UploadMedia(mediaType, fileName string, data []byte) string {
 }
 
 // 上传图文消息的图片，图片要小于1M
-func (w *Wx) UploadImgMsg(mediaType, fileName string, data []byte) string {
+func (w *wxConf) UploadImgMsg(mediaType, fileName string, data []byte) string {
 	ret := Map{}
 	if PostFileByteJSON(fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=%s", w.web.AccessToken), "media", fileName, data, ret) != nil {
 		return ""
