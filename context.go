@@ -1,8 +1,10 @@
 package g
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"net"
 	"net/http"
 
@@ -254,4 +256,31 @@ func (c *GContext) Context() context.Context {
 		return c.Request.Context()
 	}
 	return c.engine.Ctx
+}
+
+// 发送模板邮件
+func (c *GContext) SendTemplateMail(to, tplname, title string, data ...any) error {
+	t := c.engine.template.Lookup(c.engine.conf.Stmp.TemplatePrex)
+	if t == nil {
+		return errors.New("模板不存在")
+	}
+	mailt := t.Lookup(tplname)
+	if mailt == nil {
+		return errors.New("模板不存在")
+	}
+	var args any
+	if len(data) > 0 {
+		args = data
+	}
+	w := bytes.NewBuffer([]byte(""))
+	e := mailt.Execute(w, args)
+	if e != nil {
+		return e
+	}
+	return c.engine.conf.SendMail(to, title, true, w.Bytes())
+}
+
+// 发送邮件
+func (c *GContext) SendMail(to, title, msg string) error {
+	return c.engine.conf.SendMail(to, title, false, []byte(msg))
 }

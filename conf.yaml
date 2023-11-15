@@ -36,3 +36,10 @@ session:
   session_expire: 3600
   jwtKey: asdfsadfsdf
   redis_key: sess_
+
+smtp:
+  host:
+  username:
+  passwd:
+  auth_type: CRAMMD5
+  template_pre:

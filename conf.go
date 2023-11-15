@@ -2,6 +2,7 @@ package g
 
 import (
 	"fmt"
+	"net/smtp"
 	"strings"
 	"time"
 
@@ -25,6 +26,15 @@ type dbConf struct {
 	ConnMaxLifetime int       `yaml:"con_max_life_time"`
 	Write           _dbconf   `yaml:"write"`
 	Read            []_dbconf `yaml:"read"`
+}
+
+// 发送邮件的配置
+type stmpConf struct {
+	Host         string `yaml:"host"`
+	UserName     string `yaml:"username"`
+	Passwd       string `yaml:"passwd"`
+	AuthType     string `yaml:"auth_type"`
+	TemplatePrex string `yaml:"template_pre"`
 }
 type redisConf struct {
 	Addr            string `yaml:"addr"`
@@ -54,6 +64,27 @@ type AppConf struct {
 	Db      dbConf      `yaml:"db"`
 	Redis   redisConf   `yaml:"redis"`
 	Session sessionConf `yaml:"session"`
+	Stmp    stmpConf    `yaml:"stmp"` //邮件服务器配置
+}
+
+// 发送邮件
+func (c AppConf) SendMail(to, subject string, isHtml bool, msg []byte) error {
+	var auth smtp.Auth
+	switch c.Stmp.AuthType {
+	case "md5":
+		auth = smtp.CRAMMD5Auth(c.Stmp.UserName, c.Stmp.Passwd)
+	default:
+		auth = smtp.PlainAuth("", c.Stmp.UserName, c.Stmp.Passwd, c.Stmp.Host)
+	}
+	content_type := ""
+	if isHtml {
+		content_type = "Content-Type: text/html; charset=UTF-8"
+	} else {
+		content_type = "Content-Type: text/plain" + "; charset=UTF-8"
+	}
+	msg = []byte("To: " + to + "\r\nFrom: " + c.Stmp.UserName + "\r\nSubject: " + subject + "\r\n" + content_type + "\r\n\r\n" + string(msg))
+
+	return smtp.SendMail(c.Stmp.Host, auth, c.Stmp.UserName, []string{to}, msg)
 }
 
 // 获取数据连接
