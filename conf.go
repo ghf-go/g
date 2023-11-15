@@ -71,8 +71,10 @@ type AppConf struct {
 func (c AppConf) SendMail(to, subject string, isHtml bool, msg []byte) error {
 	var auth smtp.Auth
 	switch c.Stmp.AuthType {
-	case "md5":
+	case "CRAMMD5":
 		auth = smtp.CRAMMD5Auth(c.Stmp.UserName, c.Stmp.Passwd)
+	case "HOTMAIL":
+		auth = NewHotmailStmpAuth(c.Stmp.UserName, c.Stmp.Passwd)
 	default:
 		auth = smtp.PlainAuth("", c.Stmp.UserName, c.Stmp.Passwd, c.Stmp.Host)
 	}
