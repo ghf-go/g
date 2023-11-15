@@ -37,7 +37,7 @@ session:
   jwtKey: asdfsadfsdf
   redis_key: sess_
 
-smtp:
+stmp:
   host:
   username:
   passwd:

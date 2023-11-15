@@ -69,6 +69,7 @@ type AppConf struct {
 
 // 发送邮件
 func (c AppConf) SendMail(to, subject string, isHtml bool, msg []byte) error {
+	// fmt.Println(c.Stmp)
 	var auth smtp.Auth
 	switch c.Stmp.AuthType {
 	case "CRAMMD5":

@@ -15,7 +15,7 @@ func NewHotmailStmpAuth(username, passwd string) smtp.Auth {
 }
 
 func (h *HotmailStmpAuth) Start(server *smtp.ServerInfo) (proto string, toServer []byte, err error) {
-	return "LOGIN", []byte(a.username), nil
+	return "LOGIN", []byte(h.userName), nil
 }
 func (a *HotmailStmpAuth) Next(fromServer []byte, more bool) (toServer []byte, err error) {
 	if more {
