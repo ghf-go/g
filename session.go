@@ -38,27 +38,35 @@ func jwt_session(g *GContext) {
 }
 
 // redis session
-func redis_session(g *GContext) {
-	cf := g.engine.conf.Session
-	sid := g.Request.Header.Get(cf.Name)
-	if sid != "" {
-		data, e := g.GetRedis().Get(g.Request.Context(), sid).Result()
+func redis_session(c *GContext) {
+	cf := c.engine.conf.Session
+	sid := c.Request.Header.Get(cf.Name)
+	if sid == "" || sid == "null" {
+		ck, e := c.Request.Cookie(cf.Name)
 		if e != nil {
-			sysDebug("获取Redis失败 %s", e.Error())
-		} else {
-			json.Unmarshal([]byte(data), g.session)
+			sid = ck.Value
 		}
 	}
-	g.Next()
-	if len(g.session) > 0 {
-		if sid == "" {
-			sid = fmt.Sprintf("%s_%d", cf.RedisKey, time.Now().UnixNano())
+	if sid == "" || sid == "null" {
+		sid = fmt.Sprintf("%s_%d", cf.RedisKey, time.Now().UnixNano())
+	}
+	if sid != "" {
+		data, e := c.GetRedis().Get(c.Request.Context(), sid).Result()
+		if e != nil {
+			sysDebug("获取Redis失败 -> %s", e.Error())
+		} else {
+			json.Unmarshal([]byte(data), &c.session)
+			// fmt.Println(c.session, data, sid, "asdsdf")
 		}
-		rdata, e := json.Marshal(g.session)
+	}
+	c.Next()
+	if len(c.session) > 0 {
+
+		rdata, e := json.Marshal(c.session)
 		if e == nil {
-			g.GetRedis().Set(g.Request.Context(), sid, string(rdata), time.Duration(cf.Expire)*time.Second)
-			g.Writer.Header().Add(cf.Name, sid)
-			http.SetCookie(g.Writer, &http.Cookie{
+			c.GetRedis().Set(c.Request.Context(), sid, string(rdata), time.Duration(cf.Expire)*time.Second)
+			c.Writer.Header().Add(cf.Name, sid)
+			http.SetCookie(c.Writer, &http.Cookie{
 				Name:    cf.Name,
 				Value:   sid,
 				Path:    "/",
