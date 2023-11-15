@@ -42,7 +42,7 @@ stmp:
   host:
   username:
   passwd:
-  auth_type: CRAMMD5
+  auth_type: CRAMMD5|HOTMAIL
   template_pre:
 
 wechat:
