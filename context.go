@@ -198,7 +198,8 @@ func (c *GContext) WebJsonSuccess(obj any) {
 
 // 显示模版
 func (c *GContext) WebView(obj any, tpl string) {
-	c.engine.template.Lookup("_templates").ExecuteTemplate(c.Writer, tpl, obj)
+	// fmt.Println(c.engine.conf.App.TemplateDir + tpl)
+	c.engine.template.ExecuteTemplate(c.Writer, c.engine.conf.App.TemplateDir+tpl, obj)
 }
 
 // 使用JSONP
@@ -260,20 +261,17 @@ func (c *GContext) Context() context.Context {
 
 // 发送模板邮件
 func (c *GContext) SendTemplateMail(to, tplname, title string, data ...any) error {
-	t := c.engine.template.Lookup(c.engine.conf.Stmp.TemplatePrex)
+	t := c.engine.template.Lookup(c.engine.conf.Stmp.TemplatePrex + tplname)
 	if t == nil {
 		return errors.New("模板不存在")
 	}
-	mailt := t.Lookup(tplname)
-	if mailt == nil {
-		return errors.New("模板不存在")
-	}
+
 	var args any
 	if len(data) > 0 {
 		args = data
 	}
 	w := bytes.NewBuffer([]byte(""))
-	e := mailt.Execute(w, args)
+	e := t.Execute(w, args)
 	if e != nil {
 		return e
 	}

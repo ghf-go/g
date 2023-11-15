@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path"
 	"strings"
 	"syscall"
 	"time"
@@ -79,22 +80,25 @@ func (ge *GEngine) SetTemplateFuncMap(tf template.FuncMap) {
 }
 
 // 注册模版
-func (ge *GEngine) SetTemplate(groupname, path string, ff embed.FS) {
-	ffs, e := ff.ReadDir(path)
+func (ge *GEngine) SetTemplate(groupname, dir string, ff embed.FS) {
+	// fmt.Printf("读取路径 %s \n", dir)
+	ffs, e := ff.ReadDir(dir)
 	if e != nil {
 		panic(e.Error())
 	}
 	for _, item := range ffs {
 		if item.IsDir() {
-			name := item.Name()
-			finame := strings.Replace(item.Name(), path, "", 0)
-			ge.SetTemplate(groupname+finame+"_", name, ff)
+			finame := item.Name()
+			ge.SetTemplate(groupname+finame+"_", dir+"/"+finame, ff)
 		} else {
-			dd, e := ff.ReadFile(item.Name())
+			dd, e := ff.ReadFile(dir + "/" + item.Name())
+			// fmt.Printf("读取文件路径 -> %s\n", dir+"/"+item.Name())
 			if e != nil {
 				panic(e.Error())
 			}
-			_, e = ge.template.New(groupname + strings.Replace(item.Name(), path, "", 0)).Parse(string(dd))
+			name := strings.Replace(path.Base(item.Name()), path.Ext(item.Name()), "", 1)
+			// fmt.Printf("模板名字 ->  %s \n", groupname+name)
+			_, e = ge.template.New(groupname + name).Parse(string(dd))
 			if e != nil {
 				panic(e.Error())
 			}

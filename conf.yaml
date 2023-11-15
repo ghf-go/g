@@ -2,6 +2,7 @@ app:
   web_port: 8081
   tcp_port: 0
   udp_port: 0
+  template_dir: 
 db:
   dbname: aa
   charset: utf8mb4
