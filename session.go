@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -19,7 +20,9 @@ func jwt_session(g *GContext) {
 	}
 	if srcdata != "" {
 		ddata := AesDecode(cf.JwtKey, srcdata)
-		json.Unmarshal([]byte(ddata), g.session)
+		us := json.NewDecoder(strings.NewReader(ddata))
+		us.UseNumber()
+		us.Decode(&g.session)
 	}
 	g.Next()
 	if len(g.session) > 0 {
@@ -55,8 +58,9 @@ func redis_session(c *GContext) {
 		if e != nil {
 			sysDebug("获取Redis失败 -> %s", e.Error())
 		} else {
-			json.Unmarshal([]byte(data), &c.session)
-			// fmt.Println(c.session, data, sid, "asdsdf")
+			us := json.NewDecoder(strings.NewReader(data))
+			us.UseNumber()
+			us.Decode(&c.session)
 		}
 	}
 	c.Next()

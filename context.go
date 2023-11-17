@@ -53,7 +53,12 @@ func (c *GContext) SetUserId(uid uint64) {
 
 // 回去用户ID
 func (c *GContext) GetUserId() uint64 {
-	return c.Session("uid").(uint64)
+	r := c.Session("uid")
+	if r == nil {
+		return 0
+	}
+	r2, _ := r.(json.Number).Int64()
+	return uint64(r2)
 }
 
 // 检查账号是否登录
