@@ -12,6 +12,7 @@ import (
 	"gorm.io/plugin/dbresolver"
 )
 
+// 数据库配置
 type _dbconf struct {
 	Host     string `yaml:"host"`
 	UserName string `yaml:"username"`
@@ -24,6 +25,8 @@ type paymentConf struct {
 	WxConf      *confPaymentWx      `yaml:"wx"`
 	YinLianCOnf *confPaymentYinLian `yaml:"yinlian"`
 }
+
+// 数据库配置
 type dbConf struct {
 	DbName          string    `yaml:"dbname"`
 	Charset         string    `yaml:"charset"`
@@ -43,6 +46,8 @@ type stmpConf struct {
 	AuthType     string `yaml:"auth_type"`
 	TemplatePrex string `yaml:"template_pre"`
 }
+
+// redis 配置
 type redisConf struct {
 	Addr            string `yaml:"addr"`
 	UserName        string `yaml:"username"`
@@ -53,12 +58,16 @@ type redisConf struct {
 	ConnMaxIdleTime int    `yaml:"con_max_idle_time"`
 	ConnMaxLifetime int    `yaml:"con_max_life_time"`
 }
+
+// 端口配置
 type appConf struct {
 	WebPort     int    `yaml:"web_port"`     //Web 端口
 	TcpPort     int    `yaml:"tcp_port"`     //Sock 端口
 	UdpPort     int    `yaml:"udp_port"`     //Sock 端口
 	TemplateDir string `yaml:"template_dir"` //模板路径
 }
+
+// 微信服务号配置
 type wxWeb struct {
 	AppId       string `yaml:"app_id"`
 	AppSecret   string `yaml:"app_secret"`
@@ -68,6 +77,8 @@ type wxWeb struct {
 type wxConf struct {
 	web *wxWeb `yaml:"app"`
 }
+
+// session配置
 type sessionConf struct {
 	Driver   string `yaml:"driver"`
 	Name     string `yaml:"session_name"`
@@ -75,6 +86,8 @@ type sessionConf struct {
 	JwtKey   string `yaml:"jwtKey"`
 	RedisKey string `yaml:"redis_key"`
 }
+
+// 应用配置
 type AppConf struct {
 	App         appConf      `yaml:"app"`
 	Db          dbConf       `yaml:"db"`
