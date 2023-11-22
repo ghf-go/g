@@ -19,5 +19,6 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/wechatpay-apiv3/wechatpay-go v0.2.18 // indirect
 	golang.org/x/image v0.5.0 // indirect
 )

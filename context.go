@@ -221,7 +221,7 @@ func (c *GContext) WebJsonP(call string, data any) {
 
 // 获取数据库
 func (c *GContext) GetDB() *gorm.DB {
-	return c.engine.GetDB()
+	return c.engine.GetDB().Debug()
 }
 
 // 获取Redis

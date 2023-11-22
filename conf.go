@@ -17,6 +17,13 @@ type _dbconf struct {
 	UserName string `yaml:"username"`
 	Password string `yaml:"passwd"`
 }
+
+// 支付配置
+type paymentConf struct {
+	AliConf     *confPaymentZli     `yaml:"ali"`
+	WxConf      *confPaymentWx      `yaml:"wx"`
+	YinLianCOnf *confPaymentYinLian `yaml:"yinlian"`
+}
 type dbConf struct {
 	DbName          string    `yaml:"dbname"`
 	Charset         string    `yaml:"charset"`
@@ -69,12 +76,13 @@ type sessionConf struct {
 	RedisKey string `yaml:"redis_key"`
 }
 type AppConf struct {
-	App     appConf     `yaml:"app"`
-	Db      dbConf      `yaml:"db"`
-	Redis   redisConf   `yaml:"redis"`
-	Session sessionConf `yaml:"session"`
-	Stmp    stmpConf    `yaml:"stmp"`   //邮件服务器配置
-	WxConf  *wxConf     `yaml:"wechat"` //微信配置
+	App         appConf      `yaml:"app"`
+	Db          dbConf       `yaml:"db"`
+	Redis       redisConf    `yaml:"redis"`
+	Session     sessionConf  `yaml:"session"`
+	Stmp        stmpConf     `yaml:"stmp"`    //邮件服务器配置
+	WxConf      *wxConf      `yaml:"wechat"`  //微信配置
+	PaymentConf *paymentConf `yaml:"payment"` //支付配置
 }
 
 // 发送邮件

@@ -45,6 +45,11 @@ stmp:
   auth_type: CRAMMD5|HOTMAIL
   template_pre:
 
+payment:
+    wx:
+    ali:
+    yinlian:
+
 wechat:
   app:
     app_id:
