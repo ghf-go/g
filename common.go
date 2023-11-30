@@ -102,8 +102,10 @@ func GetRequestIP(r *http.Request) string {
 	}
 	ret = r.RemoteAddr
 	if ret != "" {
-		return ret
+		ips := strings.Split(ret, ":")
+		return ips[0]
 	}
+
 	return "unknow"
 }
 
