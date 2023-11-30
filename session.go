@@ -46,7 +46,7 @@ func redis_session(c *GContext) {
 	sid := c.Request.Header.Get(cf.Name)
 	if sid == "" || sid == "null" {
 		ck, e := c.Request.Cookie(cf.Name)
-		if e != nil {
+		if e == nil {
 			sid = ck.Value
 		}
 	}

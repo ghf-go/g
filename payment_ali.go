@@ -173,8 +173,8 @@ func (p *confPaymentZli) CloseOrder(r OrderParam) {
 // 退款
 func (p *confPaymentZli) Refund(r RefundParam) *RefundOut {
 	args := p.newParam("alipay.trade.refund", map[string]string{
-		"out_trade_no":  r.OrderID,
-		"refund_amount": fmt.Sprintf("%02f", r.OrderAmount/100),
+		"out_trade_no": r.OrderID,
+		// "refund_amount": fmt.Sprintf("%02f", r.OrderAmount/100),
 	})
 	ret := &aliResponseData{}
 	e := p.exec(args, ret)
