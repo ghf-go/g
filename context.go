@@ -256,7 +256,7 @@ func (c *GContext) WsWriteJSON(obj any) error {
 func (c *GContext) BindJSON(obj any) error {
 	r := bindRequestBodyJson(c.Request, obj)
 	if r != nil {
-		c.WebJsonFail(1, "系统错误")
+		Error("解析错误 %s", r.Error())
 	}
 	return r
 }
