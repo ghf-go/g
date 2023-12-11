@@ -32,6 +32,7 @@ type GContext struct {
 	Writer            *GResponseWrite
 	wscon             *websocket.Conn
 	session           map[string]any //Session存储的数据
+	sid               string         //session的记录
 }
 type GHandlerFunc func(*GContext)
 
@@ -182,22 +183,30 @@ func (c *GContext) webJson(obj any) {
 		c.Writer.Write(data)
 	}
 }
+func (c *GContext) getAppToken() string {
+	if c.Request.Header.Get("Appid") != "" {
+		return c.sid
+	}
+	return ""
+}
 
 // web json失败
 func (c *GContext) WebJsonFail(code int, msg string) {
 	c.webJson(map[string]any{
-		"code": code,
-		"msg":  msg,
-		"data": map[string]any{},
+		"code":  code,
+		"msg":   msg,
+		"data":  map[string]any{},
+		"token": c.getAppToken(),
 	})
 }
 
 // web json成功
 func (c *GContext) WebJsonSuccess(obj any) {
 	c.webJson(map[string]any{
-		"code": 0,
-		"msg":  "",
-		"data": obj,
+		"code":  0,
+		"msg":   "",
+		"data":  obj,
+		"token": c.getAppToken(),
 	})
 }
 

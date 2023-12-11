@@ -44,40 +44,50 @@ func jwt_session(g *GContext) {
 func redis_session(c *GContext) {
 	cf := c.engine.conf.Session
 	sid := c.Request.Header.Get(cf.Name)
-	if sid == "" || sid == "null" {
-		ck, e := c.Request.Cookie(cf.Name)
-		if e == nil {
-			sid = ck.Value
+	isApp := c.Request.Header.Get("Appid") != ""
+	if !isApp {
+		if sid == "" || sid == "null" {
+			ck, e := c.Request.Cookie(cf.Name)
+			if e == nil {
+				sid = ck.Value
+			}
+		}
+		if sid == "" || sid == "null" {
+			sid = c.Request.URL.Query().Get(cf.Name)
+			sysDebug("redis getToken %s", sid)
 		}
 	}
+
 	if sid == "" || sid == "null" {
 		sid = fmt.Sprintf("%s_%d", cf.RedisKey, time.Now().UnixNano())
 	}
 	if sid != "" {
 		data, e := c.GetRedis().Get(c.Request.Context(), sid).Result()
 		if e != nil {
-			sysDebug("获取Redis失败 -> %s", e.Error())
+			sysDebug("获取Redis失败 -> %s : %s", sid, e.Error())
 		} else {
 			us := json.NewDecoder(strings.NewReader(data))
 			us.UseNumber()
 			us.Decode(&c.session)
 		}
 	}
+	c.sid = sid
 	c.Next()
 	if len(c.session) > 0 {
-
 		rdata, e := json.Marshal(c.session)
 		if e == nil {
 			c.GetRedis().Set(c.Request.Context(), sid, string(rdata), time.Duration(cf.Expire)*time.Second)
-			c.Writer.Header().Add(cf.Name, sid)
-			http.SetCookie(c.Writer, &http.Cookie{
-				Name:    cf.Name,
-				Value:   sid,
-				Path:    "/",
-				Expires: time.Now().Add(time.Duration(cf.Expire) * time.Second),
-			})
 		}
-
+	}
+	if isApp {
+		c.Writer.Header().Add(cf.Name, sid)
+	} else {
+		http.SetCookie(c.Writer, &http.Cookie{
+			Name:    cf.Name,
+			Value:   sid,
+			Path:    "/",
+			Expires: time.Now().Add(time.Duration(cf.Expire) * time.Second),
+		})
 	}
 
 }

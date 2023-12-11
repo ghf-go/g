@@ -288,9 +288,8 @@ func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST,OPTIONS,GET")
 		w.Header().Set("content-type", "application/json;charset=utf8")
-		w.Header().Set("Access-Control-Allow-Headers", "x-requested-with,content-type,Authorization,Access-Control-Allow-Origin")
+		w.Header().Set("Access-Control-Allow-Headers", "Appid,Appver,x-requested-with,Token,content-type,Cookie,Authorization,Sid,Set-Cookie,Access-Control-Allow-Origin")
 		w.WriteHeader(204)
-		fmt.Println("----", r.Method, r.URL, r.Header)
 		return
 	}
 	w.Header().Set("Access-Control-Allow-Origin", "*")
