@@ -284,6 +284,17 @@ func (ge *GEngine) SockAction() {}
 
 // httpHandle
 func (ge *GEngine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST,OPTIONS,GET")
+		w.Header().Set("content-type", "application/json;charset=utf8")
+		w.Header().Set("Access-Control-Allow-Headers", "x-requested-with,content-type,Authorization,Access-Control-Allow-Origin")
+		w.WriteHeader(204)
+		fmt.Println("----", r.Method, r.URL, r.Header)
+		return
+	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	path := r.URL.Path
 	c := &GContext{
 		engine:      ge,
