@@ -12,7 +12,7 @@ func QiniuTokenAction(c *GContext) {
 	token := c.engine.conf.StoreConf.GetQiniuToken()
 	c.WebJsonSuccess(Map{
 		"token":       token,
-		"path":        time.Now().Format("/2006/01/02/"),
+		"path":        time.Now().Format("2006/01/02/"),
 		"upload_host": c.engine.conf.StoreConf.ZoneHost,
 		"cdn":         c.engine.conf.StoreConf.CdnDomain,
 	})
