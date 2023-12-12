@@ -19,6 +19,8 @@ type _storeConf struct {
 	AccessKey string `yaml:"access_key"`
 	SecretKey string `yaml:"secret_key"`
 	Bucket    string `yaml:"bucket"`
+	ZoneHost  string `yaml:"zone"`
+	CdnDomain string `yaml:"cdnhost"`
 	qini      *auth.Credentials
 }
 
