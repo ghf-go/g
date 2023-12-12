@@ -54,3 +54,8 @@ wechat:
   app:
     app_id:
     app_secret:
+store:
+  driver: 
+  access_key: 
+  secret_key:
+  bucket:

@@ -6,11 +6,21 @@ import (
 	"strings"
 	"time"
 
+	"github.com/qiniu/go-sdk/v7/auth"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/plugin/dbresolver"
 )
+
+// 存储配置
+type _storeConf struct {
+	Driver    string `yaml:"driver"`
+	AccessKey string `yaml:"access_key"`
+	SecretKey string `yaml:"secret_key"`
+	Bucket    string `yaml:"bucket"`
+	qini      *auth.Credentials
+}
 
 // 数据库配置
 type _dbconf struct {
@@ -96,6 +106,7 @@ type AppConf struct {
 	Stmp        stmpConf     `yaml:"stmp"`    //邮件服务器配置
 	WxConf      *wxConf      `yaml:"wechat"`  //微信配置
 	PaymentConf *paymentConf `yaml:"payment"` //支付配置
+	StoreConf   *_storeConf  `yaml:"store"`   //存储配置
 }
 
 // 发送邮件
