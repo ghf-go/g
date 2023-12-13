@@ -83,7 +83,8 @@ func (c *GContext) GetAdminId() uint64 {
 	if r == nil {
 		return 0
 	}
-	return r.(uint64)
+	r2, _ := r.(json.Number).Int64()
+	return uint64(r2)
 }
 
 // 设置session字符串
