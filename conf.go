@@ -109,6 +109,7 @@ type AppConf struct {
 	WxConf      *wxConf      `yaml:"wechat"`  //微信配置
 	PaymentConf *paymentConf `yaml:"payment"` //支付配置
 	StoreConf   *_storeConf  `yaml:"store"`   //存储配置
+	AppPushConf *appPushConf `yaml:"app_push_notify"`
 }
 
 // 发送邮件

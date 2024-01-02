@@ -61,3 +61,12 @@ store:
   bucket:
   zone:
   cdnhost: 
+
+app_push_notify:
+  ios:
+    p12file:
+    passwd:
+    jwt:
+    key_id:
+    team_id:
+    env: dev
