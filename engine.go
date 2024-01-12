@@ -30,7 +30,7 @@ var wsupgrader = websocket.Upgrader{
 }
 
 type _webServer struct {
-	webRouter *router_web_node
+	webRouter *WebNode
 	webServer *http.Server
 	wshandles map[string]GHandlerFunc
 }
@@ -59,9 +59,9 @@ func NewGEngine() *GEngine {
 	return &GEngine{
 		Ctx: context.Background(),
 		webServer: &_webServer{
-			webRouter: &router_web_node{
+			webRouter: &WebNode{
 				mid:   []GHandlerFunc{},
-				nodes: map[string]*router_web_node{},
+				nodes: map[string]*WebNode{},
 				hf:    map[string]map[string]GHandlerFunc{},
 			},
 			wshandles: map[string]GHandlerFunc{},
@@ -394,7 +394,7 @@ func (ge *GEngine) WebHead(name string, fen GHandlerFunc) {
 func (ge *GEngine) WebPatch(name string, fen GHandlerFunc) {
 	ge.webServer.webRouter.add(name, http.MethodPatch, fen)
 }
-func (ge *GEngine) WebGroup(name string, fen ...GHandlerFunc) *router_web_node {
+func (ge *GEngine) WebGroup(name string, fen ...GHandlerFunc) *WebNode {
 	return ge.webServer.webRouter.addGroup(name, fen...)
 }
 

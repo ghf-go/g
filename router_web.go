@@ -6,14 +6,14 @@ import (
 	"strings"
 )
 
-type router_web_node struct {
+type WebNode struct {
 	mid   []GHandlerFunc
-	nodes map[string]*router_web_node
+	nodes map[string]*WebNode
 	hf    map[string]map[string]GHandlerFunc
 }
 
 // 添加路由
-func (n *router_web_node) add(name, method string, fen GHandlerFunc) *router_web_node {
+func (n *WebNode) add(name, method string, fen GHandlerFunc) *WebNode {
 	if nnn, ok := n.hf[name]; ok {
 		nnn[method] = fen
 		n.hf[name] = nnn
@@ -26,10 +26,10 @@ func (n *router_web_node) add(name, method string, fen GHandlerFunc) *router_web
 }
 
 // 添加分组
-func (n *router_web_node) addGroup(name string, m ...GHandlerFunc) *router_web_node {
-	ret := &router_web_node{
+func (n *WebNode) addGroup(name string, m ...GHandlerFunc) *WebNode {
+	ret := &WebNode{
 		mid:   m,
-		nodes: map[string]*router_web_node{},
+		nodes: map[string]*WebNode{},
 		hf:    map[string]map[string]GHandlerFunc{},
 	}
 	n.nodes[name] = ret
@@ -37,7 +37,7 @@ func (n *router_web_node) addGroup(name string, m ...GHandlerFunc) *router_web_n
 }
 
 // 获取请求地址
-func (n *router_web_node) getHandle(path, method string, m []GHandlerFunc) ([]GHandlerFunc, error) {
+func (n *WebNode) getHandle(path, method string, m []GHandlerFunc) ([]GHandlerFunc, error) {
 	ret := append(m, n.mid...)
 	if p, ok := n.hf[path]; ok {
 		if h, ok := p[method]; ok {
@@ -59,7 +59,7 @@ func (n *router_web_node) getHandle(path, method string, m []GHandlerFunc) ([]GH
 }
 
 // 网页路由
-func (ge *router_web_node) Any(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Any(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodGet, fen)
 	ge.add(name, http.MethodPost, fen)
 	ge.add(name, http.MethodPut, fen)
@@ -70,38 +70,38 @@ func (ge *router_web_node) Any(name string, fen GHandlerFunc) *router_web_node {
 	ge.add(name, http.MethodOptions, fen)
 	return ge
 }
-func (ge *router_web_node) Post(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Post(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodPost, fen)
 	return ge
 }
-func (ge *router_web_node) Get(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Get(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodGet, fen)
 	return ge
 }
-func (ge *router_web_node) Delete(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Delete(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodDelete, fen)
 	return ge
 }
-func (ge *router_web_node) Put(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Put(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodPut, fen)
 	return ge
 }
-func (ge *router_web_node) Options(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Options(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodOptions, fen)
 	return ge
 }
-func (ge *router_web_node) Trace(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Trace(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodTrace, fen)
 	return ge
 }
-func (ge *router_web_node) Head(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Head(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodHead, fen)
 	return ge
 }
-func (ge *router_web_node) Patch(name string, fen GHandlerFunc) *router_web_node {
+func (ge *WebNode) Patch(name string, fen GHandlerFunc) *WebNode {
 	ge.add(name, http.MethodPatch, fen)
 	return ge
 }
-func (ge *router_web_node) Group(name string, fen ...GHandlerFunc) *router_web_node {
+func (ge *WebNode) Group(name string, fen ...GHandlerFunc) *WebNode {
 	return ge.addGroup(name, fen...)
 }
